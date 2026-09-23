@@ -1,0 +1,720 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>BuildYourStore — Workspace</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+<style>
+  html,body{height:100%;}
+  [hidden]{display:none !important;}
+
+  :root{
+    --bg:#FFFFFF;
+    --fg:#000000;
+    --card:#FFFFFF;
+    --card-fg:#000000;
+
+    --primary:#FF0060;
+    --primary-hover:#D90050;
+    --primary-active:#B80045;
+    --primary-fg:#FFFFFF;
+
+    --brand:#079B7E;
+    --brand-hover:#05816A;
+    --brand-active:#056F5D;
+    --brand-fg:#FFFFFF;
+
+    --secondary:#000000;
+    --secondary-hover:#1F1F1F;
+    --secondary-active:#333333;
+    --secondary-fg:#FFFFFF;
+
+    --muted:#D0D0D0;
+    --muted-fg:#595959;
+
+    --accent:#D0D0D0;
+    --accent-hover:#B5B5B5;
+    --accent-fg:#000000;
+
+    --destructive:#E32629;
+    --destructive-hover:#C7191C;
+    --destructive-muted:#FFF0F0;
+    --destructive-fg:#FFFFFF;
+
+    --success:#12A64A;
+    --success-fg:#FFFFFF;
+    --success-muted:#EFFAF3;
+
+    --warning:#D87A00;
+    --warning-fg:#FFFFFF;
+    --warning-muted:#FFF9E8;
+
+    --info:#0B8CC5;
+    --info-fg:#FFFFFF;
+    --info-muted:#EEF8FD;
+
+    --border:#BDBDBD;
+    --border-strong:#999999;
+    --input:#BDBDBD;
+    --ring:#FF0060;
+
+    --shadow-sm: 0 1px 4px rgba(0,0,0,.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,.08);
+  }
+
+  *{box-sizing:border-box;}
+  body{background:var(--bg);color:var(--fg);font-family:'Poppins',system-ui,sans-serif;line-height:1.5;margin:0;overflow:hidden;}
+  button,input{font-family:inherit;}
+  :focus-visible{outline:2px solid var(--ring);outline-offset:2px;}
+
+  /* ---------- type scale ---------- */
+  .t-display{font-size:32px;font-weight:700;line-height:1.2;}
+  .t-h1{font-size:24px;font-weight:700;line-height:1.3;}
+  .t-h2{font-size:18px;font-weight:600;line-height:1.35;}
+  .t-h3{font-size:16px;font-weight:600;line-height:1.4;}
+  .t-body{font-size:14px;font-weight:400;}
+  .t-body-md{font-size:14px;font-weight:500;}
+  .t-small{font-size:12px;font-weight:400;}
+  .t-caption{font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;}
+
+  /* ---------- shell ---------- */
+  .shell{height:100vh;display:flex;}
+
+  /* ---------- sidebar ---------- */
+  .sidebar{width:240px;flex-shrink:0;border-right:1px solid var(--border);background:#fff;display:flex;flex-direction:column;gap:32px;padding:24px 20px;overflow-y:auto;}
+  .sb-brand svg{height:18px;width:auto;display:block;}
+  .sb-label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-fg);margin-bottom:14px;}
+  .sb-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:18px;}
+  .sb-step{display:flex;align-items:flex-start;gap:10px;}
+  .sb-dot{width:18px;height:18px;border-radius:50%;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;border:2px solid var(--border);background:#fff;transition:background 200ms,border-color 200ms;}
+  .sb-dot svg{width:10px;height:10px;stroke:#fff;display:none;}
+  .sb-step.done .sb-dot{background:var(--success);border-color:var(--success);}
+  .sb-step.done .sb-dot svg{display:block;}
+  .sb-step.current .sb-dot{background:var(--primary);border-color:var(--primary);}
+  .sb-step-name{font-size:14px;font-weight:500;color:var(--fg);}
+  .sb-step.upcoming .sb-step-name{color:var(--muted-fg);}
+  .sb-step-value{font-size:12px;color:var(--muted-fg);margin-top:2px;}
+  .sb-step.current .sb-step-value{color:var(--primary);font-weight:500;}
+  .sb-shopify-status{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:var(--fg);}
+  .sb-shopify-status .sb-dot{width:10px;height:10px;border:none;background:var(--border);}
+  .sb-shopify-status.connecting .sb-dot{background:var(--primary);}
+  .sb-shopify-status.connected .sb-dot{background:var(--success);}
+  .sb-shopify-status.connecting .sb-shopify-text,
+  .sb-shopify-status.connected .sb-shopify-text{color:var(--fg);}
+  .sb-shopify-status .sb-shopify-text{color:var(--muted-fg);}
+
+  /* ---------- workspace ---------- */
+  .workspace{flex:1;min-width:0;display:flex;flex-direction:column;background:#fff;}
+  .workbar{height:56px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 32px;border-bottom:1px solid var(--border);}
+  #wbTitle{font-size:16px;font-weight:600;}
+  .stage{flex:1;overflow-y:auto;padding:32px;max-width:720px;}
+
+  /* ---------- divider ---------- */
+  .phase-divider{display:flex;align-items:center;gap:14px;margin:36px 0 24px;}
+  .phase-divider:first-child{margin-top:0;}
+  .pd-label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-fg);white-space:nowrap;}
+  .pd-line{flex:1;height:1px;background:var(--border);}
+
+  /* ---------- AI row ---------- */
+  .ai-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:20px;}
+  .ai-mark{width:28px;height:28px;border-radius:8px;background:#fff;border:1px solid var(--border);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+  .ai-content{padding-top:4px;}
+  .ai-label{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted-fg);margin-bottom:5px;}
+  .ai-text{font-size:14px;color:var(--fg);line-height:1.6;}
+  .typing-dots{display:flex;gap:4px;padding:9px 0;}
+  .typing-dots i{width:6px;height:6px;border-radius:50%;background:var(--muted-fg);display:inline-block;animation:blink 1.2s infinite ease-in-out;}
+  .typing-dots i:nth-child(2){animation-delay:.2s;}
+  .typing-dots i:nth-child(3){animation-delay:.4s;}
+  @keyframes blink{0%,80%,100%{opacity:.25;}40%{opacity:1;}}
+
+  /* ---------- user row ---------- */
+  .user-row{display:flex;justify-content:flex-end;margin:0 0 20px;}
+  .user-chip{background:var(--accent);color:var(--fg);font-size:13px;font-weight:500;padding:9px 14px;border-radius:8px;max-width:80%;}
+
+  /* ---------- interactive rows (indented under ai mark) ---------- */
+  .row-indent{margin:0 0 20px 38px;}
+  .chip-row{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 20px 38px;}
+
+  /* ---------- buttons ---------- */
+  .btn{font-family:'Poppins',sans-serif;font-size:14px;font-weight:600;height:40px;padding:0 18px;border-radius:8px;border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:background 150ms,border-color 150ms,color 150ms;white-space:nowrap;}
+  .btn-primary{background:var(--primary);color:var(--primary-fg);}
+  .btn-primary:hover{background:var(--primary-hover);}
+  .btn-primary:active{background:var(--primary-active);}
+  .btn-secondary{background:#fff;color:var(--fg);border:1px solid var(--border);}
+  .btn-secondary:hover{border-color:var(--border-strong);}
+  .btn-black{background:var(--secondary);color:var(--secondary-fg);}
+  .btn-black:hover{background:var(--secondary-hover);}
+  .btn-black:active{background:var(--secondary-active);}
+  .btn-ghost{background:transparent;color:var(--muted-fg);border:1px solid var(--border);}
+  .btn-ghost:hover{color:var(--fg);border-color:var(--border-strong);}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+  .btn.full{width:100%;}
+
+  /* ---------- category cards (niche) ---------- */
+  .card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 20px 38px;}
+  .cat-card{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:16px;border:1px solid var(--border);border-radius:12px;background:#fff;cursor:pointer;text-align:left;font-family:inherit;transition:border-color 150ms,background 150ms;}
+  .cat-card:hover{border-color:var(--border-strong);background:#FAFAFA;}
+  .cat-card.selected{border:2px solid var(--primary);padding:15px;background:#fff;}
+  .cat-card:disabled{cursor:default;}
+  .cat-card:disabled:not(.selected){opacity:.45;}
+  .cat-icon svg{width:20px;height:20px;stroke-width:1.75;color:var(--fg);}
+  .cat-label{font-size:14px;font-weight:500;color:var(--fg);}
+  .cat-hint{display:block;font-size:12px;font-weight:400;color:var(--muted-fg);margin-top:2px;}
+  .cat-card.ai-pick{grid-column:1/-1;flex-direction:row;align-items:center;gap:12px;}
+  .cat-card.ai-pick .cat-icon svg{color:var(--primary);}
+  .cat-check{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;background:var(--primary);align-items:center;justify-content:center;display:none;}
+  .cat-check svg{width:10px;height:10px;stroke:#fff;}
+  .cat-card.selected .cat-check{display:flex;}
+
+  /* ---------- style cards (banners) ---------- */
+  .style-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 16px 38px;}
+  .style-card{position:relative;border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;aspect-ratio:4/3;background-size:cover;background-position:center;padding:0;}
+  .style-card:hover{border-color:var(--border-strong);}
+  .style-card.selected{border:2px solid var(--primary);}
+  .style-check{position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;background:#fff;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;}
+  .style-check svg{width:11px;height:11px;stroke:var(--border);display:block;}
+  .style-card.selected .style-check{background:var(--primary);border-color:var(--primary);}
+  .style-card.selected .style-check svg{stroke:#fff;}
+
+  /* ---------- AI build progress ---------- */
+  .work-card{margin:0 0 20px 38px;}
+  .work-list{display:flex;flex-direction:column;gap:11px;}
+  .work-item{display:flex;align-items:center;gap:10px;}
+  .work-dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .work-dot svg{width:10px;height:10px;stroke:#fff;display:none;}
+  .work-item.state-done .work-dot{background:var(--success);border-color:var(--success);}
+  .work-item.state-done .work-dot svg{display:block;}
+  .work-item.state-active .work-dot{border-color:var(--border);border-top-color:var(--primary);animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .work-text{font-size:14px;color:var(--muted-fg);}
+  .work-text b{color:var(--fg);font-weight:500;}
+  .work-item.state-done .work-text,.work-item.state-active .work-text{color:var(--fg);}
+
+  /* ---------- generic card (offers) ---------- */
+  .card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:24px;max-width:400px;}
+  .card h2{font-size:16px;font-weight:600;margin:0 0 14px;line-height:1.35;}
+  .card h2 s{color:var(--muted-fg);font-weight:400;}
+  .card ul{list-style:none;margin:0 0 20px;padding:0;display:flex;flex-direction:column;gap:8px;}
+  .card li{font-size:13px;color:var(--muted-fg);padding-left:16px;position:relative;}
+  .card li::before{content:"–";position:absolute;left:0;color:var(--border-strong);}
+  .card-foot{font-size:12px;color:var(--muted-fg);margin-top:14px;text-align:center;}
+
+  /* ---------- path visual ---------- */
+  .path-visual{display:flex;align-items:flex-start;margin:22px 0;}
+  .path-node{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;}
+  .path-circle{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .path-circle svg{width:16px;height:16px;}
+  .path-node.done .path-circle{background:var(--success);color:#fff;}
+  .path-node.active .path-circle{background:var(--primary);color:#fff;}
+  .path-node.pending .path-circle{background:#fff;border:2px solid var(--border);color:var(--muted-fg);}
+  .path-label{font-size:12px;font-weight:600;color:var(--fg);line-height:1.4;}
+  .path-label span{display:block;font-weight:400;color:var(--muted-fg);font-size:11px;}
+  .path-line{flex:0 0 20px;height:1px;background:var(--border);margin-top:18px;}
+
+  /* ---------- handoff overlay ---------- */
+  .handoff-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:50;}
+  .fake-browser{width:280px;background:#fff;border-radius:12px;overflow:hidden;box-shadow:var(--shadow-md);border:1px solid var(--border);}
+  .fake-browser-bar{background:#F5F5F5;padding:8px 10px;display:flex;align-items:center;gap:5px;border-bottom:1px solid var(--border);}
+  .fb-dot{width:7px;height:7px;border-radius:50%;background:var(--border);display:inline-block;}
+  .fb-url{margin-left:6px;font-size:10.5px;color:var(--muted-fg);}
+  .fake-browser-body{padding:30px 18px;display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .fb-spinner{width:22px;height:22px;border-radius:50%;border:2.5px solid var(--border);border-top-color:var(--primary);animation:spin .8s linear infinite;}
+  .fb-text{font-size:12.5px;color:var(--fg);text-align:center;}
+
+  /* ---------- success banner ---------- */
+  .success-banner{display:flex;align-items:center;gap:10px;background:var(--success-muted);border:1px solid var(--success);color:var(--success);font-weight:600;font-size:14px;padding:12px 16px;border-radius:12px;margin:0 0 20px 38px;max-width:400px;}
+  .success-banner svg{width:18px;height:18px;flex-shrink:0;}
+
+  /* ---------- modal ---------- */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:60;}
+  .modal{width:360px;background:#fff;border-radius:16px;padding:24px;box-shadow:var(--shadow-md);}
+  .modal h3{font-size:16px;font-weight:600;margin:0 0 8px;}
+  .modal p{font-size:13px;color:var(--muted-fg);margin:0 0 20px;line-height:1.5;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;}
+
+  /* ---------- toast ---------- */
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(8px);background:var(--fg);color:#fff;font-size:13px;font-weight:500;padding:10px 18px;border-radius:8px;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow-md);z-index:70;opacity:0;transition:opacity 200ms,transform 200ms;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .toast svg{width:14px;height:14px;stroke:var(--success);}
+
+  /* ---------- command bar ---------- */
+  .cmdbar{border-top:1px solid var(--border);padding:16px 32px;display:flex;gap:10px;align-items:center;flex-shrink:0;}
+  .cmd-input{flex:1;max-width:720px;height:40px;border:1px solid var(--input);border-radius:8px;padding:0 14px;font-size:14px;color:var(--fg);background:#fff;}
+  .cmd-input::placeholder{color:var(--muted-fg);}
+  .cmd-input:disabled{background:#FAFAFA;color:var(--muted-fg);}
+  .cmd-input:focus{outline:none;border-color:var(--ring);box-shadow:0 0 0 3px rgba(255,0,96,.12);}
+  .cmd-send{width:40px;height:40px;flex-shrink:0;border-radius:8px;background:var(--primary);color:#fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;}
+  .cmd-send:hover{background:var(--primary-hover);}
+  .cmd-send:disabled{opacity:.4;cursor:not-allowed;}
+
+  /* ---------- preview panel ---------- */
+  .preview-panel{width:0;flex-shrink:0;overflow:hidden;border-left:none;background:#FAFAFA;display:flex;flex-direction:column;transition:width 300ms ease;}
+  .preview-panel.in{width:380px;border-left:1px solid var(--border);}
+  .pp-toolbar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0;}
+  .pp-tabs{display:flex;gap:2px;background:var(--accent);padding:3px;border-radius:8px;}
+  .pp-tab{font-size:12px;font-weight:500;padding:5px 10px;border-radius:6px;border:none;background:transparent;color:var(--muted-fg);cursor:pointer;}
+  .pp-tab.active{background:#fff;color:var(--fg);box-shadow:var(--shadow-sm);}
+  .pp-status{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;}
+  .pp-status.draft{background:var(--warning-muted);color:var(--warning);}
+  .pp-status.live{background:var(--success-muted);color:var(--success);}
+  .pp-frame-wrap{flex:1;overflow-y:auto;padding:16px;}
+  .pp-frame{border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#fff;transition:max-width 250ms;}
+  .pp-frame.mobile{max-width:220px;margin:0 auto;}
+  .pp-browser-bar{display:flex;align-items:center;gap:6px;padding:8px 12px;background:#F5F5F5;border-bottom:1px solid var(--border);}
+  .pp-dot{width:7px;height:7px;border-radius:50%;background:var(--border);display:inline-block;}
+  .pp-url{margin-left:6px;font-size:10.5px;color:var(--muted-fg);}
+  .pv-skeleton{padding:16px;}
+  .sk-line{height:12px;background:var(--accent);border-radius:4px;}
+  .sk-block{background:var(--accent);border-radius:8px;}
+  .sk-hero{height:110px;margin-top:16px;}
+  .sk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px;}
+  .sk-grid .sk-block{height:56px;}
+  .pv-nav{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);}
+  .pv-logo{font-weight:700;font-size:14px;}
+  .pv-links{font-size:11px;color:var(--muted-fg);}
+  .pv-hero{position:relative;height:150px;background-size:cover;background-position:center;display:flex;align-items:flex-end;padding:16px;}
+  .pv-hero::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,.35);}
+  .pv-hero>*{position:relative;z-index:1;}
+  .pv-eyebrow{color:#fff;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;}
+  .pv-title{color:#fff;font-size:17px;font-weight:700;line-height:1.25;margin:4px 0 10px;max-width:220px;}
+  .pv-cta{display:inline-block;background:#fff;color:#000;font-size:11.5px;font-weight:600;padding:7px 14px;border-radius:8px;}
+  .pv-products{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:16px;}
+  .pv-product-img{height:56px;border-radius:8px;background-size:cover;background-position:center;margin-bottom:6px;}
+  .pv-product-name{font-size:11px;font-weight:600;}
+  .pv-product-price{font-size:10.5px;color:var(--muted-fg);}
+
+  ::-webkit-scrollbar{width:10px;height:10px;}
+  ::-webkit-scrollbar-thumb{background:var(--accent);border-radius:100px;border:2px solid #fff;}
+</style>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="sb-brand"><svg viewBox="0 0 216 27" xmlns="http://www.w3.org/2000/svg"><path d="M21.8158 5.5332C23.8708 5.5332 25.5956 7.08195 25.8168 9.125L27.2308 22.2051C27.488 24.585 25.6236 26.6621 23.2299 26.6621H4.02477C1.63106 26.662 -0.233375 24.5849 0.0237967 22.2051L1.43786 9.125C1.65897 7.08195 3.3838 5.53322 5.43884 5.5332H21.8158ZM20.6703 10.3125C19.9757 10.3125 19.4125 10.8757 19.4125 11.5703C19.4124 14.7653 16.8223 17.3555 13.6273 17.3555C10.4324 17.3554 7.84225 14.7652 7.84216 11.5703C7.84216 10.8757 7.27892 10.3125 6.58434 10.3125C5.88994 10.3127 5.32751 10.8759 5.32751 11.5703C5.3276 16.1544 9.04327 19.87 13.6273 19.8701C18.2114 19.8701 21.928 16.1544 21.9281 11.5703C21.9281 10.8758 21.3648 10.3125 20.6703 10.3125ZM9.09997 0C10.2113 2.36362e-05 11.1117 0.901393 11.1117 2.0127C11.1114 3.12378 10.2111 4.02439 9.09997 4.02441C7.98881 4.02441 7.08753 3.12379 7.08727 2.0127C7.08727 0.901379 7.98865 0 9.09997 0ZM18.1547 0C19.266 0 20.1674 0.901379 20.1674 2.0127C20.1671 3.12379 19.2658 4.02441 18.1547 4.02441C17.0436 4.02428 16.1432 3.12371 16.1429 2.0127C16.1429 0.90146 17.0434 0.000132068 18.1547 0Z" fill="#009A7B"/><path d="M210.869 11.6105V13.9245H215.396V16.9227H210.869V19.4782H216V22.6374H206.925V8.45129H216V11.6105H210.869Z" fill="black"/><path d="M200.805 22.6374L197.988 17.4057H197.565V22.6374H193.622V8.45129H199.839C200.98 8.45129 201.945 8.65252 202.737 9.05496C203.528 9.44399 204.125 9.98729 204.528 10.6849C204.93 11.369 205.131 12.1404 205.131 12.9989C205.131 13.9648 204.863 14.8166 204.327 15.5544C203.803 16.2788 203.032 16.7953 202.012 17.1038L205.212 22.6374H200.805ZM197.565 14.7093H199.517C200.054 14.7093 200.456 14.5818 200.725 14.327C200.993 14.0721 201.127 13.7032 201.127 13.2202C201.127 12.7641 200.986 12.4087 200.705 12.1538C200.436 11.8855 200.041 11.7513 199.517 11.7513H197.565V14.7093Z" fill="black"/><path d="M184.585 22.7783C183.256 22.7783 182.036 22.4697 180.922 21.8527C179.809 21.2222 178.923 20.3569 178.266 19.2569C177.622 18.1435 177.3 16.8892 177.3 15.4941C177.3 14.0989 177.622 12.8513 178.266 11.7513C178.923 10.6379 179.809 9.77265 180.922 9.15557C182.036 8.53849 183.256 8.22995 184.585 8.22995C185.926 8.22995 187.147 8.53849 188.247 9.15557C189.36 9.77265 190.239 10.6379 190.883 11.7513C191.527 12.8513 191.849 14.0989 191.849 15.4941C191.849 16.8892 191.527 18.1435 190.883 19.2569C190.239 20.3569 189.36 21.2222 188.247 21.8527C187.133 22.4697 185.913 22.7783 184.585 22.7783ZM184.585 19.116C185.591 19.116 186.382 18.7874 186.959 18.1301C187.549 17.4727 187.844 16.5941 187.844 15.4941C187.844 14.3672 187.549 13.4818 186.959 12.8379C186.382 12.1806 185.591 11.8519 184.585 11.8519C183.565 11.8519 182.767 12.1806 182.19 12.8379C181.613 13.4818 181.325 14.3672 181.325 15.4941C181.325 16.6075 181.613 17.4929 182.19 18.1502C182.767 18.7941 183.565 19.116 184.585 19.116Z" fill="black"/><path d="M176.324 8.45129V11.5904H172.541V22.6374H168.597V11.5904H164.854V8.45129H176.324Z" fill="black"/><path d="M158.514 22.7783C156.864 22.7783 155.509 22.3892 154.449 21.6112C153.389 20.8197 152.819 19.6929 152.738 18.2307H156.944C156.984 18.727 157.132 19.0892 157.387 19.3173C157.642 19.5453 157.97 19.6593 158.373 19.6593C158.735 19.6593 159.03 19.5721 159.258 19.3978C159.5 19.2099 159.62 18.9551 159.62 18.6331C159.62 18.2173 159.426 17.8953 159.037 17.6672C158.648 17.4392 158.017 17.1843 157.145 16.9026C156.22 16.5941 155.468 16.2989 154.892 16.0172C154.328 15.7221 153.832 15.2995 153.402 14.7495C152.987 14.1861 152.779 13.455 152.779 12.5562C152.779 11.644 153.007 10.866 153.463 10.222C153.919 9.56472 154.549 9.06837 155.354 8.733C156.159 8.39763 157.071 8.22995 158.091 8.22995C159.741 8.22995 161.056 8.61898 162.035 9.39704C163.028 10.1617 163.557 11.2416 163.625 12.6367H159.339C159.325 12.2074 159.191 11.8855 158.936 11.6708C158.695 11.4562 158.379 11.3489 157.99 11.3489C157.695 11.3489 157.454 11.4361 157.266 11.6105C157.078 11.7849 156.984 12.033 156.984 12.355C156.984 12.6233 157.085 12.858 157.286 13.0593C157.501 13.2471 157.762 13.4148 158.071 13.5623C158.379 13.6965 158.835 13.8709 159.439 14.0855C160.338 14.394 161.076 14.7026 161.653 15.0111C162.243 15.3062 162.746 15.7288 163.162 16.2788C163.591 16.8154 163.806 17.4996 163.806 18.3313C163.806 19.1764 163.591 19.9343 163.162 20.6051C162.746 21.2758 162.136 21.8057 161.331 22.1947C160.539 22.5838 159.6 22.7783 158.514 22.7783Z" fill="black"/><path d="M147.041 22.6374L144.224 17.4057H143.802V22.6374H139.858V8.45129H146.075C147.216 8.45129 148.181 8.65252 148.973 9.05496C149.764 9.44399 150.361 9.98729 150.764 10.6849C151.166 11.369 151.367 12.1404 151.367 12.9989C151.367 13.9648 151.099 14.8166 150.563 15.5544C150.039 16.2788 149.268 16.7953 148.249 17.1038L151.448 22.6374H147.041ZM143.802 14.7093H145.753C146.29 14.7093 146.692 14.5818 146.961 14.327C147.229 14.0721 147.363 13.7032 147.363 13.2202C147.363 12.7641 147.222 12.4087 146.941 12.1538C146.672 11.8855 146.277 11.7513 145.753 11.7513H143.802V14.7093Z" fill="#009A7B"/><path d="M129.396 8.45129V16.6813C129.396 17.4459 129.57 18.0362 129.919 18.452C130.281 18.8679 130.824 19.0758 131.549 19.0758C132.273 19.0758 132.817 18.8679 133.179 18.452C133.554 18.0227 133.742 17.4325 133.742 16.6813V8.45129H137.686V16.6813C137.686 17.9825 137.411 19.0959 136.861 20.0215C136.311 20.9337 135.56 21.6246 134.607 22.0941C133.668 22.5502 132.622 22.7783 131.468 22.7783C130.315 22.7783 129.282 22.5502 128.37 22.0941C127.471 21.6246 126.76 20.9337 126.237 20.0215C125.727 19.1093 125.472 17.9959 125.472 16.6813V8.45129H129.396Z" fill="#009A7B"/><path d="M116.495 22.7783C115.167 22.7783 113.946 22.4697 112.833 21.8527C111.72 21.2222 110.834 20.3569 110.177 19.2569C109.533 18.1435 109.211 16.8892 109.211 15.4941C109.211 14.0989 109.533 12.8513 110.177 11.7513C110.834 10.6379 111.72 9.77265 112.833 9.15557C113.946 8.53849 115.167 8.22995 116.495 8.22995C117.837 8.22995 119.058 8.53849 120.158 9.15557C121.271 9.77265 122.15 10.6379 122.794 11.7513C123.437 12.8513 123.759 14.0989 123.759 15.4941C123.759 16.8892 123.437 18.1435 122.794 19.2569C122.15 20.3569 121.271 21.2222 120.158 21.8527C119.044 22.4697 117.823 22.7783 116.495 22.7783ZM116.495 19.116C117.501 19.116 118.293 18.7874 118.87 18.1301C119.46 17.4727 119.755 16.5941 119.755 15.4941C119.755 14.3672 119.46 13.4818 118.87 12.8379C118.293 12.1806 117.501 11.8519 116.495 11.8519C115.476 11.8519 114.678 12.1806 114.101 12.8379C113.524 13.4818 113.235 14.3672 113.235 15.4941C113.235 16.6075 113.524 17.4929 114.101 18.1502C114.678 18.7941 115.476 19.116 116.495 19.116Z" fill="#009A7B"/><path d="M108.483 8.45129L103.493 18.1301V22.6374H99.5288V18.1301L94.5385 8.45129H99.0459L101.541 13.9245L104.036 8.45129H108.483Z" fill="#009A7B"/><path d="M86.4021 8.45129C87.8912 8.45129 89.1924 8.75313 90.3058 9.35679C91.4327 9.94704 92.2979 10.7788 92.9016 11.8519C93.5052 12.9251 93.8071 14.1526 93.8071 15.5343C93.8071 16.9026 93.4985 18.1233 92.8814 19.1965C92.2778 20.2697 91.4125 21.1148 90.2857 21.7319C89.1723 22.3356 87.8777 22.6374 86.4021 22.6374H80.788V8.45129H86.4021ZM86.1003 19.1563C87.254 19.1563 88.1594 18.841 88.8168 18.2105C89.4741 17.5801 89.8028 16.688 89.8028 15.5343C89.8028 14.3672 89.4741 13.4684 88.8168 12.8379C88.1594 12.194 87.254 11.8721 86.1003 11.8721H84.732V19.1563H86.1003Z" fill="black"/><path d="M74.8478 19.6191H79.2545V22.6374H70.9038V8.45129H74.8478V19.6191Z" fill="black"/><path d="M68.6578 8.45129V22.6374H64.7139V8.45129H68.6578Z" fill="black"/><path d="M54.2521 8.45129V16.6813C54.2521 17.4459 54.4265 18.0362 54.7753 18.452C55.1375 18.8679 55.6808 19.0758 56.4051 19.0758C57.1295 19.0758 57.6728 18.8679 58.035 18.452C58.4107 18.0227 58.5985 17.4325 58.5985 16.6813V8.45129H62.5424V16.6813C62.5424 17.9825 62.2674 19.0959 61.7174 20.0215C61.1674 20.9337 60.4162 21.6246 59.4637 22.0941C58.5247 22.5502 57.4783 22.7783 56.3247 22.7783C55.171 22.7783 54.1381 22.5502 53.2258 22.0941C52.3271 21.6246 51.6161 20.9337 51.0929 20.0215C50.5831 19.1093 50.3283 17.9959 50.3283 16.6813V8.45129H54.2521Z" fill="black"/><path d="M45.9437 15.3532C46.7754 15.541 47.4327 15.9569 47.9156 16.6008C48.412 17.2313 48.6602 17.9557 48.6602 18.774C48.6602 19.9813 48.2443 20.927 47.4126 21.6112C46.5809 22.2953 45.4138 22.6374 43.9113 22.6374H36.8887V8.45129H43.69C45.1388 8.45129 46.2723 8.77325 47.0906 9.41716C47.9223 10.0611 48.3382 10.9666 48.3382 12.1337C48.3382 12.9654 48.1169 13.6629 47.6742 14.2264C47.2449 14.7764 46.6681 15.152 45.9437 15.3532ZM40.8326 14.0855H42.8247C43.8174 14.0855 44.3138 13.6764 44.3138 12.858C44.3138 12.0129 43.8174 11.5904 42.8247 11.5904H40.8326V14.0855ZM43.1266 19.4581C44.1193 19.4581 44.6156 19.0423 44.6156 18.2105C44.6156 17.7813 44.4815 17.4526 44.2132 17.2246C43.9583 16.9965 43.5894 16.8825 43.1064 16.8825H40.8326V19.4581H43.1266Z" fill="black"/></svg></div>
+
+    <div class="sb-section">
+      <div class="sb-label">Build progress</div>
+      <ul class="sb-steps" id="sbSteps">
+        <li class="sb-step current" data-step="niche"><span class="sb-dot"></span><div><div class="sb-step-name">Niche</div><div class="sb-step-value">Not started</div></div></li>
+        <li class="sb-step upcoming" data-step="visual"><span class="sb-dot"></span><div><div class="sb-step-name">Visual direction</div><div class="sb-step-value">Not started</div></div></li>
+        <li class="sb-step upcoming" data-step="store"><span class="sb-dot"></span><div><div class="sb-step-name">Store</div><div class="sb-step-value">Not started</div></div></li>
+        <li class="sb-step upcoming" data-step="launch"><span class="sb-dot"></span><div><div class="sb-step-name">Launch</div><div class="sb-step-value">Not started</div></div></li>
+      </ul>
+    </div>
+
+    <div class="sb-section" style="margin-top:auto;">
+      <div class="sb-label">Shopify</div>
+      <div class="sb-shopify-status" id="sbShopify"><span class="sb-dot"></span><span class="sb-shopify-text">Not connected</span></div>
+    </div>
+  </aside>
+
+  <main class="workspace">
+    <div class="workbar">
+      <div id="wbTitle" class="t-h2">Niche</div>
+      <button class="btn btn-ghost" id="restartBtn" style="height:32px;padding:0 12px;font-size:12.5px;">Restart</button>
+    </div>
+    <div class="stage" id="stage"></div>
+    <div class="cmdbar">
+      <input class="cmd-input" id="cmdInput" type="text" placeholder="Ask AI once your store starts building…" disabled>
+      <button class="cmd-send" id="cmdSend" disabled aria-label="Send">✦</button>
+    </div>
+  </main>
+
+  <aside class="preview-panel" id="previewPanel">
+    <div class="pp-toolbar">
+      <div class="pp-tabs">
+        <button class="pp-tab active" data-device="desktop" type="button">Desktop</button>
+        <button class="pp-tab" data-device="mobile" type="button">Mobile</button>
+      </div>
+      <span class="pp-status draft" id="ppStatus">Draft</span>
+    </div>
+    <div class="pp-frame-wrap">
+      <div class="pp-frame" id="ppFrame">
+        <div class="pp-browser-bar"><span class="pp-dot"></span><span class="pp-dot"></span><span class="pp-dot"></span><span class="pp-url" id="ppUrl">yourstore.myshopify.com</span></div>
+        <div id="ppSkeleton" class="pv-skeleton">
+          <div class="sk-line" style="width:35%"></div>
+          <div class="sk-block sk-hero"></div>
+          <div class="sk-grid"><div class="sk-block"></div><div class="sk-block"></div><div class="sk-block"></div></div>
+        </div>
+        <div id="ppReal" hidden>
+          <div class="pv-nav"><span class="pv-logo" id="pvLogo"></span><span class="pv-links">Shop · About · Contact</span></div>
+          <div class="pv-hero" id="pvHero"><div><div class="pv-eyebrow">New arrivals</div><div class="pv-title" id="pvTitle"></div><div class="pv-cta">Shop Now</div></div></div>
+          <div class="pv-products">
+            <div><div class="pv-product-img" id="pvImg0"></div><div class="pv-product-name">Bestseller</div><div class="pv-product-price">$24.99</div></div>
+            <div><div class="pv-product-img" id="pvImg1"></div><div class="pv-product-name">New in</div><div class="pv-product-price">$18.50</div></div>
+            <div><div class="pv-product-img" id="pvImg2"></div><div class="pv-product-name">Staff pick</div><div class="pv-product-price">$32.00</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<div class="handoff-overlay" id="handoffOverlay" hidden>
+  <div class="fake-browser">
+    <div class="fake-browser-bar"><span class="fb-dot"></span><span class="fb-dot"></span><span class="fb-dot"></span><span class="fb-url" id="fbUrl">shopify.com/admin/charges</span></div>
+    <div class="fake-browser-body">
+      <div class="fb-spinner"></div>
+      <div class="fb-text" id="fbText">Confirming your Shopify plan&hellip;</div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="restartModal" hidden>
+  <div class="modal">
+    <h3>Start over?</h3>
+    <p>Your current draft — niche, visuals, and any progress — will be discarded. This can’t be undone.</p>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" id="modalCancel" type="button">Cancel</button>
+      <button class="btn btn-primary" id="modalConfirm" type="button">Restart</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const stage = document.getElementById('stage');
+  const overlay = document.getElementById('handoffOverlay');
+  const previewPanel = document.getElementById('previewPanel');
+  let beat = 0;
+
+  function nextDelay(){ const d = Math.max(260, 850 - beat*100); beat++; return d; }
+  function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+  function el(html){ const t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstElementChild; }
+  function scrollBottom(){ stage.scrollTop = stage.scrollHeight; }
+  function add(node){ stage.appendChild(node); scrollBottom(); return node; }
+
+  function divider(text){
+    document.getElementById('wbTitle').textContent = text.replace(/^\d+\s*·\s*/,'');
+    add(el(`<div class="phase-divider"><span class="pd-label">${text}</span><span class="pd-line"></span></div>`));
+  }
+  async function aiTyping(ms){
+    const row = add(el(`<div class="ai-row"><div class="ai-mark">&#10022;</div><div class="typing-dots"><i></i><i></i><i></i></div></div>`));
+    await sleep(ms);
+    row.remove();
+  }
+  async function aiMsg(html){
+    await aiTyping(nextDelay());
+    add(el(`<div class="ai-row"><div class="ai-mark">&#10022;</div><div class="ai-content"><div class="ai-label">AI Assistant</div><div class="ai-text">${html}</div></div></div>`));
+  }
+  async function aiCard(inner){
+    await aiTyping(nextDelay());
+    return add(el(`<div class="ai-row"><div class="ai-mark">&#10022;</div>${inner}</div>`));
+  }
+  function userMsg(text){
+    add(el(`<div class="user-row"><div class="user-chip">${text}</div></div>`));
+  }
+  function waitForChoice(options, primary){
+    return new Promise(resolve=>{
+      const row = el(`<div class="chip-row"></div>`);
+      options.forEach(opt=>{
+        const chip = el(`<button class="btn ${primary?'btn-primary':'btn-secondary'}" type="button">${opt}</button>`);
+        chip.addEventListener('click', ()=>{
+          row.querySelectorAll('button').forEach(c=>c.disabled=true);
+          row.remove();
+          resolve(opt);
+        });
+        row.appendChild(chip);
+      });
+      add(row);
+    });
+  }
+  function raceButtonVsChip(buttonEl, chipLabels){
+    return new Promise(resolve=>{
+      const row = el(`<div class="chip-row"></div>`);
+      const chips = chipLabels.map(label=>{
+        const chip = el(`<button class="btn btn-ghost" type="button">${label}</button>`);
+        row.appendChild(chip);
+        return chip;
+      });
+      add(row);
+      let done = false;
+      function finish(kind, label){
+        if (done) return;
+        done = true;
+        buttonEl.disabled = true;
+        chips.forEach(c=>c.disabled=true);
+        row.remove();
+        resolve({ kind, label });
+      }
+      buttonEl.addEventListener('click', ()=>finish('button', buttonEl.textContent), {once:true});
+      chips.forEach(chip=>{
+        chip.addEventListener('click', ()=>finish('chip', chip.textContent));
+      });
+    });
+  }
+  function waitForNiche(options){
+    return new Promise(resolve=>{
+      const grid = el(`<div class="card-grid"></div>`);
+      options.forEach(opt=>{
+        const card = el(`<button class="cat-card${opt.full?' ai-pick':''}" type="button"><span class="cat-check">${ICON_CHECK}</span><span class="cat-icon">${opt.icon}</span><span class="cat-label">${opt.label}${opt.hint?`<span class="cat-hint">${opt.hint}</span>`:''}</span></button>`);
+        card.addEventListener('click', ()=>{
+          grid.querySelectorAll('.cat-card').forEach(c=>c.disabled=true);
+          card.classList.add('selected');
+          setTimeout(()=>{ grid.remove(); resolve(opt.label); }, 220);
+        });
+        grid.appendChild(card);
+      });
+      add(grid);
+    });
+  }
+  function waitForBanners(){
+    return new Promise(resolve=>{
+      const wrap = el(`<div class="style-grid"></div>`);
+      const images=['images/banner-1.jpg','images/banner-2.jpg','images/banner-3.jpg','images/banner-4.jpg','images/banner-5.jpg','images/banner-6.jpg'];
+      const names=['Banner 1','Banner 2','Banner 3','Banner 4','Banner 5','Banner 6'];
+      const selected = [];
+      let contBtn;
+      names.forEach((name,i)=>{
+        const card = el(`<button class="style-card" type="button" style="background-image:url('${images[i]}')" aria-label="${name}"><span class="style-check">${ICON_CHECK}</span></button>`);
+        card.addEventListener('click', ()=>{
+          const idx = selected.indexOf(i);
+          if(idx>-1){ selected.splice(idx,1); card.classList.remove('selected'); }
+          else { if(selected.length>=2) return; selected.push(i); card.classList.add('selected'); }
+          contBtn.disabled = selected.length!==2;
+        });
+        wrap.appendChild(card);
+      });
+      add(wrap);
+      const row = el(`<div class="chip-row"></div>`);
+      contBtn = el(`<button class="btn btn-primary" type="button" disabled>Continue &rarr;</button>`);
+      contBtn.addEventListener('click', ()=>{ row.remove(); resolve(selected.map(i=>({name:names[i], img:images[i]}))); });
+      row.appendChild(contBtn);
+      add(row);
+    });
+  }
+  async function buildProgress(steps){
+    await aiTyping(nextDelay());
+    const card = add(el(`<div class="ai-row"><div class="ai-mark">&#10022;</div><div class="ai-content"><div class="ai-label">AI Assistant</div><div class="work-card"><div class="work-list"></div></div></div></div>`));
+    const list = card.querySelector('.work-list');
+    const rows = steps.map(text=>{
+      const row = el(`<div class="work-item state-pending"><span class="work-dot">${ICON_CHECK}</span><div class="work-text">${text}</div></div>`);
+      list.appendChild(row);
+      return row;
+    });
+    for(const row of rows){
+      row.classList.replace('state-pending','state-active');
+      scrollBottom();
+      await sleep(nextDelay());
+      row.classList.replace('state-active','state-done');
+    }
+    scrollBottom();
+    return card;
+  }
+  async function showHandoff(urlLabel, statusText, ms){
+    document.getElementById('fbUrl').textContent = urlLabel;
+    document.getElementById('fbText').textContent = statusText;
+    overlay.hidden = false;
+    await sleep(ms);
+    overlay.hidden = true;
+  }
+  function toast(text){
+    const t = el(`<div class="toast">${ICON_CHECK}<span>${text}</span></div>`);
+    document.body.appendChild(t);
+    requestAnimationFrame(()=>t.classList.add('show'));
+    setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(),250); }, 2600);
+  }
+
+  function setStep(key, state, value){
+    const li = document.querySelector(`.sb-step[data-step="${key}"]`);
+    li.classList.remove('done','current','upcoming');
+    li.classList.add(state);
+    li.querySelector('.sb-dot').innerHTML = state==='done' ? ICON_CHECK : '';
+    if(value !== undefined) li.querySelector('.sb-step-value').textContent = value;
+  }
+  function setShopify(state, text){
+    const box = document.getElementById('sbShopify');
+    box.className = 'sb-shopify-status ' + state;
+    box.querySelector('.sb-shopify-text').textContent = text;
+  }
+
+  function ppShow(){
+    previewPanel.classList.add('in');
+  }
+  function ppReveal(niche, selected){
+    document.getElementById('ppStatus').textContent = 'Draft';
+    document.getElementById('ppSkeleton').hidden = true;
+    document.getElementById('ppReal').hidden = false;
+    document.getElementById('pvLogo').textContent = niche;
+    document.getElementById('pvTitle').textContent = 'Everything for your ' + niche.toLowerCase();
+    document.getElementById('pvHero').style.backgroundImage = `url('${selected[0].img}')`;
+    ['pvImg0','pvImg1','pvImg2'].forEach((id,i)=>{
+      document.getElementById(id).style.backgroundImage = `url('${selected[i % selected.length].img}')`;
+    });
+    const nicheSlug = niche.toLowerCase().replace(/[^a-z0-9]+/g, '') || 'yourstore';
+    document.getElementById('ppUrl').textContent = nicheSlug + '.myshopify.com';
+  }
+
+  const cmdInput = document.getElementById('cmdInput');
+  const cmdSend = document.getElementById('cmdSend');
+  function cmdEnable(placeholder){
+    cmdInput.disabled = false;
+    cmdSend.disabled = false;
+    cmdInput.placeholder = placeholder;
+  }
+  async function cmdHandle(){
+    const val = cmdInput.value.trim();
+    if(!val) return;
+    cmdInput.value = '';
+    userMsg(val);
+    await aiTyping(500);
+    add(el(`<div class="ai-row"><div class="ai-mark">&#10022;</div><div class="ai-content"><div class="ai-label">AI Assistant</div><div class="ai-text">Got it — I&rsquo;ll fold that into your next revision.</div></div></div>`));
+  }
+  cmdSend.addEventListener('click', cmdHandle);
+  cmdInput.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); cmdHandle(); } });
+
+  document.getElementById('restartBtn').addEventListener('click', ()=>{ document.getElementById('restartModal').hidden = false; });
+  document.getElementById('modalCancel').addEventListener('click', ()=>{ document.getElementById('restartModal').hidden = true; });
+  document.getElementById('modalConfirm').addEventListener('click', ()=> location.reload());
+
+  document.querySelectorAll('.pp-tab').forEach(tab=>{
+    tab.addEventListener('click', ()=>{
+      document.querySelectorAll('.pp-tab').forEach(t=>t.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('ppFrame').classList.toggle('mobile', tab.dataset.device==='mobile');
+    });
+  });
+
+  const ICON_PAW = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"/></svg>';
+  const ICON_SOFA = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3"/><path d="M2 16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v1.5a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5V11a2 2 0 0 0-4 0z"/><path d="M4 18v2"/><path d="M20 18v2"/><path d="M12 4v9"/></svg>';
+  const ICON_DUMBBELL = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17.596 12.768a2 2 0 1 0 2.829-2.829l-1.768-1.767a2 2 0 0 0 2.828-2.829l-2.828-2.828a2 2 0 0 0-2.829 2.828l-1.767-1.768a2 2 0 1 0-2.829 2.829z"/><path d="m2.5 21.5 1.4-1.4"/><path d="m20.1 3.9 1.4-1.4"/><path d="M5.343 21.485a2 2 0 1 0 2.829-2.828l1.767 1.768a2 2 0 1 0 2.829-2.829l-6.364-6.364a2 2 0 1 0-2.829 2.829l1.768 1.767a2 2 0 0 0-2.828 2.829z"/><path d="m9.6 14.4 4.8-4.8"/></svg>';
+  const ICON_SHIRT = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>';
+  const ICON_SPARKLES = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></svg>';
+  const ICON_SMARTPHONE = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>';
+  const ICON_WAND = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/></svg>';
+  const ICON_CHECK = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+  const ICON_CLICK = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4.1 12 6"/><path d="m5.1 8-2.9-.8"/><path d="m6 12-1.9 2"/><path d="M7.2 2.2 8 5.1"/><path d="M9.037 9.69a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z"/></svg>';
+  const ICON_BAG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 10a4 4 0 0 1-8 0"/><path d="M3.103 6.034h17.794"/><path d="M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z"/></svg>';
+
+  async function run(){
+    divider('01 · Niche');
+    setStep('niche','current','Choosing…');
+    await aiMsg('Let&rsquo;s start with your store.<br>What do you want to sell?');
+    const niche = await waitForNiche([
+      {label:'Pet products', icon:ICON_PAW},
+      {label:'Home & Living', icon:ICON_SOFA},
+      {label:'Fitness & Sport', icon:ICON_DUMBBELL},
+      {label:'Fashion & Apparel', icon:ICON_SHIRT},
+      {label:'Beauty & Skincare', icon:ICON_SPARKLES},
+      {label:'Tech & Gadgets', icon:ICON_SMARTPHONE},
+      {label:"Let AI decide", icon:ICON_WAND, hint:"We&rsquo;ll pick a niche that&rsquo;s converting right now", full:true},
+    ]);
+    userMsg(niche);
+    let resolvedNiche = niche;
+    if (niche === "Let AI decide") {
+      resolvedNiche = 'Pet products';
+      await aiMsg(`Happy to pick for you — right now, ${resolvedNiche} is converting well for stores like yours. Let&rsquo;s build that.`);
+    }
+    setStep('niche','done', resolvedNiche);
+    setStep('visual','current','Choose 2 looks');
+
+    divider('02 · Visual direction');
+    await aiMsg(`Good pick. Here are a few homepage looks for a ${resolvedNiche} store — choose two:`);
+    const banners = await waitForBanners();
+    userMsg(banners.map(b=>b.name).join(' + '));
+    setStep('visual','done', banners.length+' selected');
+    setStep('store','current','Building…');
+
+    divider('03 · Building');
+    cmdEnable('Ask AI to tweak your store…');
+    ppShow();
+    await buildProgress([
+      '<b>Applying</b> your niche&hellip;',
+      '<b>Adding</b> your visual direction&hellip;',
+      '<b>Laying out</b> your homepage&hellip;',
+      '<b>Finishing</b> touches&hellip;'
+    ]);
+    ppReveal(resolvedNiche, banners);
+    toast('Store draft created');
+    setStep('store','current','Draft ready');
+
+    divider('04 · Preview');
+    await aiMsg('Here&rsquo;s a first look at your store — you can keep refining it with AI, or continue when it feels right.');
+    await waitForChoice(['Looks great, let&rsquo;s continue &rarr;'], true).then(userMsg);
+    setStep('store','done','Ready');
+
+    divider('05 · Activate Shopify plan');
+    setStep('launch','current','Connect Shopify');
+    await aiMsg('One thing left to make it go live:');
+    const card = await aiCard(`<div class="ai-content" style="padding-top:0;"><div class="card">
+        <h2>Approve billing to keep your store</h2>
+        <ul><li>$1/month for your first 3 months, then $39/month</li><li>Cancel anytime, directly in Shopify</li></ul>
+        <button class="btn btn-primary full" id="activateBtn" type="button">Activate My Shopify Plan &#8599;</button>
+        <div class="path-visual">
+          <div class="path-node done"><div class="path-circle">${ICON_CHECK}</div><div class="path-label">Store created<span>on BuildYourStore</span></div></div>
+          <div class="path-line"></div>
+          <div class="path-node active"><div class="path-circle">${ICON_CLICK}</div><div class="path-label">Activate plan<span>on Shopify</span></div></div>
+          <div class="path-line"></div>
+          <div class="path-node pending"><div class="path-circle">${ICON_BAG}</div><div class="path-label">Finish setup<span>on BuildYourStore</span></div></div>
+        </div>
+        <div class="card-foot">You&rsquo;ll finish this on Shopify&rsquo;s own secure page — then come right back here and tap Continue.</div>
+      </div></div>`);
+    await new Promise(resolve=>{
+      card.querySelector('#activateBtn').addEventListener('click', resolve, {once:true});
+    });
+    setShopify('connecting', 'Connecting…');
+    add(el(`<div class="row-indent t-small" style="color:var(--muted-fg);">&#8599; opened Shopify in a new tab</div>`));
+    await showHandoff('shopify.com/admin/charges', 'Redirecting to Shopify&hellip;', 1100);
+    await aiMsg("Welcome back. We can&rsquo;t detect this automatically yet — tap Continue once you&rsquo;ve activated your plan on Shopify.");
+    await waitForChoice(["I&rsquo;ve activated my plan — Continue &rarr;"], true).then(userMsg);
+    await aiTyping(600);
+    await aiMsg('Got it — your Shopify plan is active. Your store can go live.');
+    setShopify('connected', 'Connected');
+    await waitForChoice(['Continue to Store Setup &rarr;'], true).then(userMsg);
+
+    divider('06 · Store type upsell');
+    await aiMsg(`Build your ${resolvedNiche} store around one proven product?`);
+    const upsellCard = await aiCard(`<div class="ai-content" style="padding-top:0;"><div class="card">
+        <h2>Build My ${resolvedNiche} Store — <s>$197</s> $97</h2>
+        <ul>
+          <li>1 hand-picked hero product, matched to your niche</li>
+          <li>Expert-designed store, ready in ~24 hours</li>
+          <li>Conversion-optimized copy included</li>
+        </ul>
+        <button class="btn btn-primary full" id="upsellBtn" type="button">Build My ${resolvedNiche} Store — $97</button>
+        <div class="card-foot">Matched to your niche — today only</div>
+      </div></div>`);
+    const upsell = await raceButtonVsChip(upsellCard.querySelector('#upsellBtn'), [`No thanks, I&rsquo;ll keep the generic 10-product store`]);
+    userMsg(upsell.label);
+
+    if (upsell.kind === 'button') {
+      // Pro path
+    } else {
+      await aiMsg('Totally fine — before you go, one last one-time price:');
+      const downsellCard = await aiCard(`<div class="ai-content" style="padding-top:0;"><div class="card">
+          <h2>Same store, one-time — $47</h2>
+          <ul><li>Identical Pro catalog and theme as the $97 offer</li></ul>
+          <button class="btn btn-primary full" id="downsellBtn" type="button">Build It for $47</button>
+        </div></div>`);
+      const downsell = await raceButtonVsChip(downsellCard.querySelector('#downsellBtn'), ["No, I&rsquo;ll keep the free version"]);
+      userMsg(downsell.label);
+    }
+
+    divider('07 · AutoDS trial');
+    await aiMsg('One more thing — want us to keep your catalog stocked automatically?');
+    const autodsCard = await aiCard(`<div class="ai-content" style="padding-top:0;"><div class="card">
+        <h2>Start your free AutoDS trial</h2>
+        <ul><li>Free for 3 days</li><li>Auto-import and restock products for you</li></ul>
+        <button class="btn btn-primary full" id="autodsBtn" type="button">Start My Free Trial &#8599;</button>
+        <div class="card-foot">Opens AutoDS in a new tab — no card needed to start.</div>
+      </div></div>`);
+    const autods = await raceButtonVsChip(autodsCard.querySelector('#autodsBtn'), ['Skip for now']);
+    userMsg(autods.label);
+    if (autods.kind === 'button') {
+      add(el(`<div class="row-indent t-small" style="color:var(--muted-fg);">&#8599; opened AutoDS in a new tab</div>`));
+      await showHandoff('autods.com/onboarding', 'Setting up your trial&hellip;', 1100);
+      await aiMsg('Nice — whenever you&rsquo;re ready, just come back and keep going.');
+    }
+    await waitForChoice(['Continue &rarr;'], true).then(userMsg);
+
+    divider('08 · Store live');
+    setStep('store','done','Ready');
+    setStep('launch','done','Live');
+    document.getElementById('ppStatus').textContent = 'Live';
+    document.getElementById('ppStatus').className = 'pp-status live';
+    await aiTyping(nextDelay());
+    add(el(`<div class="ai-row"><div class="ai-mark">&#10022;</div><div class="ai-content"><div class="ai-label">AI Assistant</div><div class="t-display" style="margin:2px 0 10px;">Your store is live.</div><div class="ai-text">A few optional things whenever you&rsquo;re ready — a free domain, more products, help growing. No rush, none of it blocks what you already have.</div></div></div>`));
+    await waitForChoice(['Got it &rarr;'], true).then(userMsg);
+  }
+
+  run();
+})();
+</script>

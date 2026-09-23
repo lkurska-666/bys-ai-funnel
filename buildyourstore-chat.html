@@ -1,0 +1,989 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>BuildYourStore — AI Store Studio</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+<style>
+  html,body{height:100%;}
+  [hidden]{display:none !important;}
+
+  :root{
+    --fg:#000000;
+    --primary:#FF0060; --primary-hover:#D90050; --primary-active:#B80045; --primary-soft:rgba(255,0,96,.08);
+    --brand:#079B7E;
+    --secondary:#000000; --secondary-hover:#1F1F1F;
+    --muted:#D0D0D0; --muted-fg:#595959;
+    --accent:#D0D0D0;
+    --destructive:#E32629; --destructive-muted:#FFF0F0;
+    --success:#12A64A; --success-muted:#EFFAF3;
+    --warning:#D87A00; --warning-muted:#FFF9E8;
+    --border:#BDBDBD; --border-strong:#999999; --border-soft:#E4E4E4;
+    --ring:#FF0060;
+    --shadow-sm:0 1px 4px rgba(0,0,0,.06);
+    --shadow-md:0 4px 16px rgba(0,0,0,.08);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;color:var(--fg);line-height:1.5;font-family:'Poppins',system-ui,sans-serif;
+    background:#FFFFFF url('images/bg.png') no-repeat top center;
+    background-size:100% auto;background-attachment:fixed;overflow:hidden;
+  }
+  button,input{font-family:inherit;}
+  :focus-visible{outline:2px solid var(--ring);outline-offset:2px;}
+
+  .t-h1{font-size:24px;font-weight:700;line-height:1.3;letter-spacing:-.01em;margin:0;}
+  .t-h2{font-size:18px;font-weight:600;margin:0;}
+  .t-h3{font-size:16px;font-weight:600;margin:0;}
+  .t-caption{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;}
+  .hint{font-size:12px;color:var(--muted-fg);}
+
+  /* ---------------- shell ---------------- */
+  .app{height:100vh;display:flex;flex-direction:column;}
+  .topbar{height:56px;flex-shrink:0;display:flex;align-items:center;gap:16px;padding:0 20px;border-bottom:1px solid var(--border-soft);background:rgba(255,255,255,.94);backdrop-filter:blur(10px);}
+  .tb-brand svg{height:16px;width:auto;display:block;}
+  .tb-sep{width:1px;height:24px;background:var(--border-soft);}
+  .tb-store{display:flex;flex-direction:column;line-height:1.25;min-width:0;}
+  .tb-store-name{font-size:13px;font-weight:600;white-space:nowrap;}
+  .tb-store-meta{font-size:11px;color:var(--muted-fg);white-space:nowrap;}
+  .tb-step{font-size:12px;font-weight:500;color:var(--muted-fg);white-space:nowrap;}
+  .tb-spacer{flex:1;}
+  .tb-right{display:flex;align-items:center;gap:12px;}
+  .avatar{width:28px;height:28px;border-radius:50%;background:var(--fg);color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;}
+  .icon-btn{height:32px;padding:0 10px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--muted-fg);font-size:12.5px;font-weight:500;display:inline-flex;align-items:center;gap:6px;cursor:pointer;transition:color 150ms,border-color 150ms;}
+  .icon-btn:hover{color:var(--fg);border-color:var(--border);}
+  .icon-btn:disabled{opacity:.35;cursor:not-allowed;}
+  .shop-status{display:inline-flex;align-items:center;gap:7px;height:28px;padding:0 10px;border-radius:100px;border:1px solid var(--border-soft);font-size:12px;font-weight:500;color:var(--muted-fg);}
+  .shop-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);}
+  .shop-status.connecting{border-color:rgba(255,0,96,.3);color:var(--primary);}
+  .shop-status.connecting .shop-dot{background:var(--primary);}
+  .shop-status.connected{border-color:rgba(7,155,126,.35);color:var(--brand);}
+  .shop-status.connected .shop-dot{background:var(--brand);}
+  .menu-wrap{position:relative;}
+  .menu{position:absolute;top:38px;right:0;min-width:210px;background:#fff;border:1px solid var(--border-soft);border-radius:12px;box-shadow:var(--shadow-md);padding:6px;z-index:40;}
+  .menu-item{width:100%;text-align:left;background:transparent;border:none;border-radius:8px;padding:9px 10px;font-size:13px;cursor:pointer;}
+  .menu-item:hover{background:#F6F6F6;}
+  .menu-sep{height:1px;background:var(--border-soft);margin:6px 4px;}
+
+  .frame{flex:1;display:flex;min-height:0;}
+  .sidebar{width:240px;flex-shrink:0;background:#fff;border-right:1px solid var(--border-soft);padding:24px 20px;display:flex;flex-direction:column;gap:28px;overflow-y:auto;}
+  .sb-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted-fg);margin-bottom:14px;}
+  .sb-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;}
+  .sb-step{display:flex;align-items:flex-start;gap:10px;padding:8px 8px 8px 6px;border-radius:8px;}
+  .sb-step.current{background:var(--primary-soft);}
+  .sb-dot{width:18px;height:18px;border-radius:50%;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;border:2px solid var(--muted);background:#fff;transition:background 200ms,border-color 200ms;}
+  .sb-dot svg{width:10px;height:10px;stroke:#fff;stroke-width:3;}
+  .sb-step.done .sb-dot{background:var(--success);border-color:var(--success);}
+  .sb-step.current .sb-dot{background:var(--primary);border-color:var(--primary);}
+  .sb-step-name{font-size:13.5px;font-weight:500;}
+  .sb-step.upcoming .sb-step-name{color:var(--muted-fg);}
+  .sb-step-value{font-size:11.5px;color:var(--muted-fg);margin-top:1px;}
+  .sb-step.current .sb-step-value{color:var(--primary);font-weight:500;}
+  .sb-facts{margin:0;display:flex;flex-direction:column;gap:12px;}
+  .sb-fact dt{font-size:11px;color:var(--muted-fg);}
+  .sb-fact dd{margin:0;font-size:13px;font-weight:500;}
+  .sb-fact dd.empty{color:var(--muted-fg);font-weight:400;}
+  .sb-foot{margin-top:auto;font-size:11px;color:var(--muted-fg);line-height:1.5;}
+
+  /* ---------------- chat column ---------------- */
+  .chatcol{flex:1 1 auto;min-width:0;min-height:0;overflow-y:auto;padding:28px 32px 40px;}
+  .chat{max-width:880px;margin:0 auto;}
+  .frame.split .chatcol{flex:0 0 560px;}
+  .frame.split .chat{max-width:100%;}
+  .frame.maxpreview .chatcol{display:none;}
+
+  .divider{display:flex;align-items:center;gap:14px;margin:34px 0 20px;}
+  .divider:first-child{margin-top:0;}
+  .divider .lbl{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted-fg);white-space:nowrap;}
+  .divider .line{flex:1;height:1px;background:var(--border-soft);}
+
+  .ai-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:18px;}
+  .ai-mark{width:28px;height:28px;border-radius:8px;background:#fff;border:1px solid var(--border);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+  .ai-body{min-width:0;}
+  .ai-label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-fg);margin:0 0 6px 2px;}
+  .ai-text{font-size:14px;line-height:1.55;max-width:56ch;background:#fff;border:1px solid var(--border-soft);border-radius:14px;padding:12px 16px;box-shadow:var(--shadow-sm);}
+  .typing{display:flex;gap:5px;padding:9px 0;}
+  .typing i{width:6px;height:6px;border-radius:50%;background:var(--muted-fg);display:inline-block;animation:blink 1.2s infinite ease-in-out;}
+  .typing i:nth-child(2){animation-delay:.2s;}
+  .typing i:nth-child(3){animation-delay:.4s;}
+  @keyframes blink{0%,80%,100%{opacity:.25;}40%{opacity:1;}}
+  .fade-in{animation:fadeUp 240ms ease both;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  .user-row{display:flex;justify-content:flex-end;margin:0 0 18px;}
+  .user-chip{background:var(--secondary);color:#fff;font-size:13.5px;font-weight:500;padding:10px 16px;border-radius:14px;max-width:80%;}
+  .sys-note{margin:0 0 18px 38px;font-size:12px;color:var(--muted-fg);}
+
+  .indent{margin:0 0 18px 38px;}
+
+  /* answer pills with icons */
+  .pill-row{display:flex;flex-wrap:wrap;gap:10px;}
+  .pill{display:inline-flex;align-items:center;gap:9px;height:42px;padding:0 18px;border:1px solid var(--border);border-radius:100px;background:#fff;cursor:pointer;font-size:13.5px;font-weight:500;color:var(--fg);transition:border-color 150ms,background 150ms,color 150ms;}
+  .pill:hover{border-color:var(--border-strong);background:#FAFAFA;}
+  .pill svg{width:17px;height:17px;stroke-width:1.75;flex-shrink:0;}
+  .pill.selected{border:2px solid var(--primary);color:var(--primary);padding:0 17px;}
+  .pill.selected svg{color:var(--primary);}
+  .pill:disabled{cursor:default;}
+  .pill:disabled:not(.selected){opacity:.4;}
+
+  /* direction (image) cards */
+  .dir-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px;}
+  .counter{font-size:12px;font-weight:500;color:var(--muted-fg);}
+  .counter.full{color:var(--primary);}
+  .dir-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .dir-card{position:relative;border:1px solid var(--border);border-radius:12px;background:#fff;padding:0;overflow:hidden;cursor:pointer;text-align:left;transition:border-color 150ms;}
+  .dir-card:hover{border-color:var(--border-strong);}
+  .dir-card.selected{border:2px solid var(--primary);}
+  .dir-thumb{aspect-ratio:3/2;background-size:cover;background-position:center;}
+  .dir-meta{padding:10px 12px 12px;}
+  .dir-name{font-size:13px;font-weight:600;}
+  .dir-desc{font-size:11px;color:var(--muted-fg);margin-top:2px;}
+  .dir-ind{position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;background:#fff;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;}
+  .dir-ind svg{width:11px;height:11px;stroke:transparent;stroke-width:3;}
+  .dir-card.selected .dir-ind{background:var(--primary);border-color:var(--primary);}
+  .dir-card.selected .dir-ind svg{stroke:#fff;}
+  .dir-card.disabled{opacity:.5;cursor:not-allowed;}
+
+  /* buttons */
+  .btn{font-size:14px;font-weight:600;height:40px;padding:0 18px;border-radius:8px;border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:background 150ms,border-color 150ms,color 150ms;white-space:nowrap;}
+  .btn-primary{background:var(--primary);color:#fff;}
+  .btn-primary:hover{background:var(--primary-hover);}
+  .btn-primary:active{background:var(--primary-active);}
+  .btn-secondary{background:#fff;color:var(--fg);border:1px solid var(--border);}
+  .btn-secondary:hover{border-color:var(--border-strong);}
+  .btn-black{background:var(--secondary);color:#fff;}
+  .btn-black:hover{background:var(--secondary-hover);}
+  .btn-ghost{background:transparent;color:var(--muted-fg);border:1px solid var(--border);}
+  .btn-ghost:hover{color:var(--fg);border-color:var(--border-strong);}
+  .btn-sm{height:32px;padding:0 12px;font-size:12.5px;}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-row{display:flex;flex-wrap:wrap;gap:10px;}
+
+  /* build checklist */
+  .work{display:flex;flex-direction:column;gap:11px;}
+  .work-item{display:flex;align-items:center;gap:10px;}
+  .work-dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#fff;}
+  .work-dot svg{width:10px;height:10px;stroke:#fff;stroke-width:3;display:none;}
+  .work-item.done .work-dot{background:var(--success);border-color:var(--success);}
+  .work-item.done .work-dot svg{display:block;}
+  .work-item.active .work-dot{border-color:var(--muted);border-top-color:var(--primary);animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .work-text{font-size:14px;color:var(--muted-fg);}
+  .work-text b{color:var(--fg);font-weight:500;}
+  .work-item.done .work-text,.work-item.active .work-text{color:var(--fg);}
+  .work-meter{margin-top:16px;display:flex;align-items:center;gap:12px;}
+  .meter{flex:1;height:6px;border-radius:100px;background:#EDEDED;overflow:hidden;}
+  .meter-fill{height:100%;width:0;background:var(--primary);border-radius:100px;transition:width 400ms ease;}
+  .meter-pct{font-size:13px;font-weight:600;min-width:38px;text-align:right;}
+
+  /* cards / offers in chat */
+  .card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:24px;max-width:440px;box-shadow:var(--shadow-sm);}
+  .card h3{font-size:16px;font-weight:600;margin:0 0 16px;line-height:1.4;}
+  .card h3 s{color:var(--muted-fg);font-weight:400;}
+  .card ul{list-style:none;margin:0 0 22px;padding:0;display:flex;flex-direction:column;gap:10px;}
+  .card li{font-size:13px;color:var(--muted-fg);padding-left:22px;position:relative;line-height:1.5;}
+  .card li svg{position:absolute;left:0;top:3px;width:13px;height:13px;stroke:var(--success);stroke-width:3;}
+  .card .btn{width:100%;}
+  .card-foot{font-size:12px;color:var(--muted-fg);margin-top:14px;text-align:center;line-height:1.5;}
+  .card.spent{opacity:.5;}
+
+  .path{display:flex;align-items:flex-start;margin:22px 0 2px;}
+  .path-node{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;}
+  .path-circle{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .path-circle svg{width:15px;height:15px;stroke-width:2;}
+  .path-node.done .path-circle{background:var(--success);color:#fff;}
+  .path-node.active .path-circle{background:var(--primary);color:#fff;}
+  .path-node.next .path-circle{background:#fff;border:2px solid var(--border);color:var(--muted-fg);}
+  .path-label{font-size:12px;font-weight:600;line-height:1.4;}
+  .path-label span{display:block;font-weight:400;color:var(--muted-fg);font-size:11px;}
+  .path-line{flex:0 0 18px;height:1px;background:var(--border);margin-top:17px;}
+
+  .checklist{list-style:none;margin:0 0 20px;padding:0;}
+  .ck-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-soft);}
+  .ck-item:last-child{border-bottom:none;}
+  .ck-dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--muted);background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+  .ck-dot svg{width:10px;height:10px;stroke:#fff;stroke-width:3;display:none;}
+  .ck-item.done .ck-dot{background:var(--success);border-color:var(--success);}
+  .ck-item.done .ck-dot svg{display:block;}
+  .ck-text{font-size:13.5px;font-weight:500;flex:1;}
+  .ck-note{font-size:12px;color:var(--muted-fg);}
+
+  .banner{display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:600;padding:12px 16px;border-radius:12px;max-width:440px;}
+  .banner svg{width:16px;height:16px;flex-shrink:0;stroke-width:2.5;}
+  .banner.success{background:var(--success-muted);border:1px solid rgba(18,166,74,.35);color:var(--success);}
+  .banner.error{background:var(--destructive-muted);border:1px solid rgba(227,38,41,.35);color:var(--destructive);}
+
+  /* suggestion chips (click-only AI edits) */
+  .sugg{display:flex;flex-wrap:wrap;gap:8px;}
+  .sugg button{border:1px solid var(--border-soft);background:#fff;border-radius:8px;height:32px;padding:0 12px;font-size:12.5px;color:var(--fg);cursor:pointer;transition:border-color 150ms,background 150ms;}
+  .sugg button:hover{border-color:var(--border-strong);background:#FAFAFA;}
+  .sugg button:disabled{opacity:.45;cursor:not-allowed;}
+
+  /* ---------------- preview panel ---------------- */
+  .preview{flex:0 0 0;width:0;overflow:hidden;background:#FAFAFA;border-left:1px solid transparent;display:flex;flex-direction:column;transition:flex-basis 300ms ease,width 300ms ease;}
+  .preview.in{flex:0 0 clamp(420px,44vw,760px);width:auto;border-left-color:var(--border-soft);}
+  .frame.maxpreview .preview.in{flex:1 1 auto;}
+  .pv-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border-soft);background:#fff;flex-wrap:wrap;}
+  .pv-group{display:flex;align-items:center;gap:8px;}
+  .seg{display:inline-flex;background:#F2F2F2;border-radius:8px;padding:3px;gap:2px;}
+  .seg button{border:none;background:transparent;font-size:12px;font-weight:500;color:var(--muted-fg);padding:5px 10px;border-radius:6px;cursor:pointer;}
+  .seg button.active{background:#fff;color:var(--fg);box-shadow:var(--shadow-sm);}
+  .zoom{display:inline-flex;align-items:center;border:1px solid var(--border-soft);border-radius:8px;overflow:hidden;background:#fff;}
+  .zoom button{width:28px;height:28px;border:none;background:#fff;font-size:14px;cursor:pointer;}
+  .zoom button:hover{background:#F6F6F6;}
+  .zoom button:disabled{color:var(--muted);cursor:not-allowed;}
+  .zoom-val{min-width:44px;text-align:center;font-size:11.5px;font-weight:500;border-left:1px solid var(--border-soft);border-right:1px solid var(--border-soft);height:28px;display:flex;align-items:center;justify-content:center;}
+  .pv-stage{flex:1;overflow:auto;padding:20px;display:flex;justify-content:center;align-items:flex-start;}
+  .browser{background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-md);overflow:hidden;}
+  .browser-bar{height:34px;display:flex;align-items:center;gap:6px;padding:0 12px;background:#F7F7F7;border-bottom:1px solid var(--border-soft);}
+  .browser-bar i{width:8px;height:8px;border-radius:50%;background:#D6D6D6;display:inline-block;}
+  .browser-url{margin-left:10px;font-size:11px;color:var(--muted-fg);}
+  .browser-view{overflow:hidden;}
+  .scaler{transform-origin:top left;}
+  .pv-empty{margin:auto;text-align:center;color:var(--muted-fg);font-size:13px;max-width:220px;}
+
+  /* overlays */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:60;padding:24px;}
+  .sheet{width:300px;background:#fff;border:1px solid var(--border-soft);border-radius:12px;overflow:hidden;box-shadow:var(--shadow-md);}
+  .sheet-bar{height:32px;background:#F7F7F7;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;gap:5px;padding:0 10px;}
+  .sheet-bar i{width:7px;height:7px;border-radius:50%;background:#D6D6D6;display:inline-block;}
+  .sheet-url{margin-left:8px;font-size:10.5px;color:var(--muted-fg);}
+  .sheet-body{padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;}
+  .spin{width:22px;height:22px;border:2.5px solid #E4E4E4;border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;}
+  .sheet-text{font-size:12.5px;}
+  .modal{width:400px;max-width:100%;background:#fff;border-radius:16px;padding:24px;box-shadow:var(--shadow-md);}
+  .modal h3{font-size:16px;font-weight:600;margin:0 0 8px;}
+  .modal p{font-size:13px;color:var(--muted-fg);margin:0 0 20px;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(8px);background:var(--fg);color:#fff;font-size:13px;font-weight:500;padding:10px 16px;border-radius:8px;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow-md);z-index:70;opacity:0;transition:opacity 200ms,transform 200ms;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .toast svg{width:14px;height:14px;stroke:#4ADE80;stroke-width:3;}
+  .mobile-only{display:none;}
+
+  /* ================= generated storefront ================= */
+  .store{pointer-events:none;color:#111;background:#fff;--st-accent:#111;--st-radius:8px;width:1100px;}
+  .st-nav{display:flex;align-items:center;justify-content:space-between;padding:20px 40px;border-bottom:1px solid #EAEAEA;}
+  .st-logo{font-size:15px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;}
+  .st-links{display:flex;gap:26px;font-size:13px;color:#555;}
+  .st-cart{font-size:12px;color:#555;}
+  .st-hero{position:relative;min-height:340px;display:flex;align-items:center;padding:56px 40px;background-size:cover;background-position:center;}
+  .st-hero::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,.34);}
+  .st-hero-inner{position:relative;z-index:1;color:#fff;max-width:520px;}
+  .st-eyebrow{font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;opacity:.9;}
+  .st-title{font-size:44px;font-weight:700;line-height:1.08;letter-spacing:-.02em;margin:14px 0 24px;}
+  .st-btn{display:inline-block;background:#fff;color:#111;font-size:13px;font-weight:600;padding:13px 26px;border-radius:var(--st-radius);}
+  .st-sec{padding:56px 40px;}
+  .st-sec-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:24px;}
+  .st-sec-head h3{font-size:20px;font-weight:600;margin:0;letter-spacing:-.01em;}
+  .st-link{font-size:12.5px;color:var(--st-accent);font-weight:500;}
+  .st-products{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
+  .st-prod-img{aspect-ratio:3/4;background-size:cover;background-position:center;border-radius:var(--st-radius);background-color:#F1F1F1;}
+  .st-prod-name{font-size:13px;font-weight:500;margin-top:10px;}
+  .st-prod-price{font-size:12.5px;color:#666;margin-top:2px;}
+  .st-cats{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .st-cat{position:relative;aspect-ratio:4/3;border-radius:var(--st-radius);overflow:hidden;background-size:cover;background-position:center;display:flex;align-items:flex-end;padding:18px;}
+  .st-cat::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.5),rgba(0,0,0,0) 60%);}
+  .st-cat span{position:relative;z-index:1;color:#fff;font-size:14px;font-weight:600;}
+  .st-ed{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center;padding:56px 40px;background:#FAFAFA;}
+  .st-ed-media{aspect-ratio:4/3;background-size:cover;background-position:center;border-radius:var(--st-radius);}
+  .st-ed h3{font-size:26px;font-weight:600;line-height:1.25;margin:12px 0;}
+  .st-ed p{font-size:13.5px;color:#555;line-height:1.7;margin:0 0 16px;}
+  .st-news{padding:56px 40px;text-align:center;border-top:1px solid #EAEAEA;}
+  .st-news h3{font-size:22px;font-weight:600;margin:0 0 8px;}
+  .st-news p{font-size:13.5px;color:#555;margin:0 0 20px;}
+  .st-news-form{display:flex;gap:10px;justify-content:center;}
+  .st-input{width:280px;height:44px;border:1px solid #DADADA;border-radius:var(--st-radius);display:flex;align-items:center;padding:0 14px;font-size:13px;color:#999;}
+  .st-sub{height:44px;display:inline-flex;align-items:center;padding:0 22px;border-radius:var(--st-radius);background:#111;color:#fff;font-size:13px;font-weight:600;}
+  .st-footer{background:#111;color:#fff;padding:44px 40px 28px;}
+  .st-foot-cols{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:32px;}
+  .st-foot-logo{font-size:14px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;}
+  .st-foot-cols p{font-size:12px;color:rgba(255,255,255,.6);line-height:1.7;margin:10px 0 0;}
+  .st-foot-h{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:12px;}
+  .st-foot-links{display:flex;flex-direction:column;gap:8px;font-size:12.5px;color:rgba(255,255,255,.85);}
+  .st-foot-bottom{margin-top:36px;padding-top:18px;border-top:1px solid rgba(255,255,255,.14);display:flex;justify-content:space-between;font-size:11.5px;color:rgba(255,255,255,.5);}
+
+  .store.dir-editorial .st-title{font-size:48px;}
+  .store.dir-warm{--st-accent:#D87A00;--st-radius:12px;}
+  .store.dir-warm .st-sub{background:#D87A00;}
+  .store.dir-minimal{--st-radius:4px;}
+  .store.dir-minimal .st-title{font-size:38px;font-weight:300;}
+  .store.dir-luxury{--st-radius:0px;}
+  .store.dir-luxury .st-logo{letter-spacing:.24em;font-weight:600;}
+  .store.dir-luxury .st-title{font-size:40px;font-weight:400;letter-spacing:.01em;}
+  .store.dir-luxury .st-sec-head h3{font-weight:400;letter-spacing:.06em;text-transform:uppercase;font-size:16px;}
+  .store.dir-bold{--st-radius:0px;}
+  .store.dir-bold .st-title{font-size:52px;font-weight:700;text-transform:uppercase;line-height:1;}
+  .store.dir-bold .st-sec-head h3{font-weight:700;text-transform:uppercase;font-size:22px;}
+  .store.dir-bold .st-btn{background:var(--primary);color:#fff;}
+  .store.dir-natural{--st-accent:#079B7E;--st-radius:14px;}
+  .store.dir-natural .st-sub{background:#079B7E;}
+
+  .store.vp-tablet{width:768px;}
+  .store.vp-tablet .st-products{grid-template-columns:repeat(2,1fr);}
+  .store.vp-tablet .st-cats{grid-template-columns:repeat(2,1fr);}
+  .store.vp-tablet .st-ed{grid-template-columns:1fr;gap:24px;}
+  .store.vp-tablet .st-title{font-size:36px;}
+  .store.vp-mobile{width:390px;}
+  .store.vp-mobile .st-nav{padding:14px 16px;}
+  .store.vp-mobile .st-links{display:none;}
+  .store.vp-mobile .st-hero{min-height:230px;padding:28px 16px;}
+  .store.vp-mobile .st-title{font-size:26px;margin:10px 0 18px;}
+  .store.vp-mobile .st-sec{padding:28px 16px;}
+  .store.vp-mobile .st-products{grid-template-columns:1fr 1fr;gap:12px;}
+  .store.vp-mobile .st-cats{grid-template-columns:1fr;gap:12px;}
+  .store.vp-mobile .st-ed{grid-template-columns:1fr;gap:18px;padding:28px 16px;}
+  .store.vp-mobile .st-news{padding:28px 16px;}
+  .store.vp-mobile .st-news-form{flex-direction:column;}
+  .store.vp-mobile .st-input{width:100%;}
+  .store.vp-mobile .st-sub{justify-content:center;}
+  .store.vp-mobile .st-footer{padding:28px 16px 20px;}
+  .store.vp-mobile .st-foot-cols{grid-template-columns:1fr 1fr;gap:22px;}
+
+  .store.minimal-hero .st-hero{background-image:none !important;background:#fff;min-height:260px;border-bottom:1px solid #EAEAEA;}
+  .store.minimal-hero .st-hero::after{display:none;}
+  .store.minimal-hero .st-hero-inner{color:#111;}
+  .store.minimal-hero .st-btn{background:#111;color:#fff;}
+  .store.premium-type .st-title{letter-spacing:.02em;font-weight:400;}
+  .store.premium-type .st-logo{letter-spacing:.26em;}
+  .store.premium-type .st-eyebrow{letter-spacing:.24em;}
+  .store.premium-type .st-sec-head h3{font-weight:400;letter-spacing:.08em;text-transform:uppercase;font-size:15px;}
+  .store.warm-colors{--st-accent:#D87A00;}
+  .store.warm-colors .st-sub{background:#D87A00;}
+  .store.warm-colors .st-ed,.store.warm-colors .st-news{background:var(--warning-muted);}
+
+  /* ================= mobile (390) ================= */
+  @media (max-width:900px){
+    body{overflow:auto;background-size:cover;background-attachment:scroll;}
+    .app{height:auto;min-height:100vh;}
+    .desktop-only{display:none !important;}
+    .mobile-only{display:block;}
+    .topbar{height:52px;padding:0 14px;position:sticky;top:0;z-index:30;gap:10px;}
+    .tb-brand svg{height:14px;}
+    .tb-store,.tb-step.desktop-only{display:none;}
+    #shopSlot,.topbar .avatar{display:none;}
+    .frame{flex-direction:column;}
+    .sidebar{display:none;}
+    .chatcol{padding:20px 16px 40px;overflow:visible;}
+    .frame.split .chatcol{flex:1 1 auto;}
+    .cat-grid,.frame.split .cat-grid{grid-template-columns:1fr 1fr;}
+    .dir-grid{grid-template-columns:1fr 1fr;}
+    .card{max-width:100%;}
+    .path-label span{display:none;}
+    .preview.in,.frame.split .preview.in{flex:1 1 auto;width:100%;border-left:none;border-top:1px solid var(--border-soft);}
+    .pv-stage{padding:12px;}
+    .zoom{display:none;}
+  }
+
+  ::-webkit-scrollbar{width:10px;height:10px;}
+  ::-webkit-scrollbar-thumb{background:#DADADA;border-radius:100px;border:2px solid #fff;}
+</style>
+
+<div class="app">
+  <header class="topbar">
+    <div class="tb-brand" id="tbBrand"></div>
+    <div class="tb-sep desktop-only"></div>
+    <div class="tb-store desktop-only">
+      <span class="tb-store-name" id="tbStoreName">Untitled store</span>
+      <span class="tb-store-meta" id="tbStoreMeta">No niche selected</span>
+    </div>
+    <div class="tb-sep desktop-only"></div>
+    <span class="tb-step desktop-only" id="tbStep">Step 1 of 6 · Niche</span>
+    <span class="tb-step mobile-only" id="tbStepMobile">Step 1 of 6</span>
+    <div class="tb-spacer"></div>
+    <div class="tb-right">
+      <div id="shopSlot"></div>
+      <div class="menu-wrap">
+        <button class="icon-btn" id="helpBtn">Help</button>
+        <div class="menu" id="helpMenu" hidden>
+          <button class="menu-item" data-act="restart">Restart the flow</button>
+          <button class="menu-item" data-act="error">Simulate generation error</button>
+          <div class="menu-sep"></div>
+          <button class="menu-item" data-act="docs">Design system notes</button>
+        </div>
+      </div>
+      <div class="avatar">OK</div>
+    </div>
+  </header>
+
+  <div class="frame" id="frame">
+    <aside class="sidebar">
+      <div>
+        <div class="sb-label">Build progress</div>
+        <ul class="sb-steps" id="sbSteps">
+          <li class="sb-step current" data-step="niche"><span class="sb-dot"></span><div><div class="sb-step-name">Niche</div><div class="sb-step-value">Choosing</div></div></li>
+          <li class="sb-step upcoming" data-step="banners"><span class="sb-dot"></span><div><div class="sb-step-name">Homepage design</div><div class="sb-step-value">Not started</div></div></li>
+          <li class="sb-step upcoming" data-step="store"><span class="sb-dot"></span><div><div class="sb-step-name">Store</div><div class="sb-step-value">Not started</div></div></li>
+          <li class="sb-step upcoming" data-step="plan"><span class="sb-dot"></span><div><div class="sb-step-name">Shopify plan</div><div class="sb-step-value">Not active</div></div></li>
+          <li class="sb-step upcoming" data-step="setup"><span class="sb-dot"></span><div><div class="sb-step-name">Store setup</div><div class="sb-step-value">Not started</div></div></li>
+          <li class="sb-step upcoming" data-step="live"><span class="sb-dot"></span><div><div class="sb-step-name">Store live</div><div class="sb-step-value">Not started</div></div></li>
+        </ul>
+      </div>
+      <div>
+        <div class="sb-label">What I know so far</div>
+        <dl class="sb-facts">
+          <div class="sb-fact"><dt>Niche</dt><dd class="empty" id="fNiche">Not set</dd></div>
+          <div class="sb-fact"><dt>Homepage design</dt><dd class="empty" id="fBanners">Not set</dd></div>
+          <div class="sb-fact"><dt>Store draft</dt><dd class="empty" id="fDraft">Not generated</dd></div>
+          <div class="sb-fact"><dt>Shopify plan</dt><dd class="empty" id="fShopify">Not active</dd></div>
+          <div class="sb-fact"><dt>Store type</dt><dd class="empty" id="fType">Not chosen</dd></div>
+          <div class="sb-fact"><dt>AutoDS trial</dt><dd class="empty" id="fAutoDS">Not offered</dd></div>
+        </dl>
+      </div>
+      <div class="sb-foot">Drafts autosave. Nothing is published until you launch.</div>
+    </aside>
+
+    <main class="chatcol" id="chatcol">
+      <div class="chat" id="chat"></div>
+    </main>
+
+    <aside class="preview" id="preview">
+      <div class="pv-toolbar">
+        <div class="pv-group">
+          <span class="t-caption" style="color:var(--muted-fg);">Preview</span>
+          <div class="seg" id="deviceSeg">
+            <button data-device="desktop" class="active" type="button">Desktop</button>
+            <button data-device="tablet" type="button">Tablet</button>
+            <button data-device="mobile" type="button">Mobile</button>
+          </div>
+        </div>
+        <div class="pv-group">
+          <div class="zoom">
+            <button id="zoomOut" type="button" aria-label="Zoom out">&minus;</button>
+            <span class="zoom-val" id="zoomVal">Fit</span>
+            <button id="zoomIn" type="button" aria-label="Zoom in">+</button>
+          </div>
+          <button class="icon-btn" id="expandBtn">Expand</button>
+        </div>
+      </div>
+      <div class="pv-stage" id="pvStage">
+        <div class="browser" id="browser">
+          <div class="browser-bar"><i></i><i></i><i></i><span class="browser-url" id="browserUrl">yourstore.myshopify.com</span></div>
+          <div class="browser-view" id="browserView">
+            <div class="scaler" id="scaler"><div class="store dir-editorial vp-desktop" id="store"></div></div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div class="overlay" id="handoff" hidden>
+  <div class="sheet">
+    <div class="sheet-bar"><i></i><i></i><i></i><span class="sheet-url" id="handoffUrl">shopify.com/admin/charges</span></div>
+    <div class="sheet-body"><div class="spin"></div><div class="sheet-text" id="handoffText">Opening Shopify&hellip;</div></div>
+  </div>
+</div>
+
+<div class="overlay" id="modalOverlay" hidden>
+  <div class="modal">
+    <h3 id="modalTitle">Title</h3>
+    <p id="modalBody">Body</p>
+    <div class="modal-actions" id="modalActions"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const el = html => { const t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstElementChild; };
+  const sleep = ms => new Promise(r=>setTimeout(r,ms));
+  const chat = $('chat'), chatcol = $('chatcol'), frame = $('frame');
+
+  const CHECK = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+  const IC = p => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+  const ICON = {
+    paw: IC('<circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"/>'),
+    sofa: IC('<path d="M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3"/><path d="M2 16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v1.5a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5V11a2 2 0 0 0-4 0z"/><path d="M4 18v2"/><path d="M20 18v2"/><path d="M12 4v9"/>'),
+    shirt: IC('<path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>'),
+    sparkles: IC('<path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/>'),
+    smartphone: IC('<rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/>'),
+    utensils: IC('<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>'),
+    dumbbell: IC('<path d="M17.596 12.768a2 2 0 1 0 2.829-2.829l-1.768-1.767a2 2 0 0 0 2.828-2.829l-2.828-2.828a2 2 0 0 0-2.829 2.828l-1.767-1.768a2 2 0 1 0-2.829 2.829z"/><path d="m2.5 21.5 1.4-1.4"/><path d="m20.1 3.9 1.4-1.4"/><path d="M5.343 21.485a2 2 0 1 0 2.829-2.828l1.767 1.768a2 2 0 1 0 2.829-2.829l-6.364-6.364a2 2 0 1 0-2.829 2.829l1.768 1.767a2 2 0 0 0-2.828 2.829z"/><path d="m9.6 14.4 4.8-4.8"/>'),
+    watch: IC('<path d="M12 10v2.2l1.6 1"/><path d="m16.13 7.66-.81-4.05a2 2 0 0 0-2-1.61h-2.68a2 2 0 0 0-2 1.61l-.78 4.05"/><path d="m7.88 16.36.8 4a2 2 0 0 0 2 1.61h2.72a2 2 0 0 0 2-1.61l.81-4.05"/><circle cx="12" cy="12" r="6"/>'),
+    wand: IC('<path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/>'),
+    click: IC('<path d="M14 4.1 12 6"/><path d="m5.1 8-2.9-.8"/><path d="m6 12-1.9 2"/><path d="M7.2 2.2 8 5.1"/><path d="M9.037 9.69a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z"/>'),
+    bag: IC('<path d="M16 10a4 4 0 0 1-8 0"/><path d="M3.103 6.034h17.794"/><path d="M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z"/>'),
+    alert: IC('<path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>')
+  };
+  const BRAND = '<svg viewBox="0 0 216 27" xmlns="http://www.w3.org/2000/svg"><path d="M21.8158 5.5332C23.8708 5.5332 25.5956 7.08195 25.8168 9.125L27.2308 22.2051C27.488 24.585 25.6236 26.6621 23.2299 26.6621H4.02477C1.63106 26.662 -0.233375 24.5849 0.0237967 22.2051L1.43786 9.125C1.65897 7.08195 3.3838 5.53322 5.43884 5.5332H21.8158ZM20.6703 10.3125C19.9757 10.3125 19.4125 10.8757 19.4125 11.5703C19.4124 14.7653 16.8223 17.3555 13.6273 17.3555C10.4324 17.3554 7.84225 14.7652 7.84216 11.5703C7.84216 10.8757 7.27892 10.3125 6.58434 10.3125C5.88994 10.3127 5.32751 10.8759 5.32751 11.5703C5.3276 16.1544 9.04327 19.87 13.6273 19.8701C18.2114 19.8701 21.928 16.1544 21.9281 11.5703C21.9281 10.8758 21.3648 10.3125 20.6703 10.3125ZM9.09997 0C10.2113 2.36362e-05 11.1117 0.901393 11.1117 2.0127C11.1114 3.12378 10.2111 4.02439 9.09997 4.02441C7.98881 4.02441 7.08753 3.12379 7.08727 2.0127C7.08727 0.901379 7.98865 0 9.09997 0ZM18.1547 0C19.266 0 20.1674 0.901379 20.1674 2.0127C20.1671 3.12379 19.2658 4.02441 18.1547 4.02441C17.0436 4.02428 16.1432 3.12371 16.1429 2.0127C16.1429 0.90146 17.0434 0.000132068 18.1547 0Z" fill="#009A7B"/><path d="M210.869 11.6105V13.9245H215.396V16.9227H210.869V19.4782H216V22.6374H206.925V8.45129H216V11.6105H210.869Z" fill="black"/><path d="M200.805 22.6374L197.988 17.4057H197.565V22.6374H193.622V8.45129H199.839C200.98 8.45129 201.945 8.65252 202.737 9.05496C203.528 9.44399 204.125 9.98729 204.528 10.6849C204.93 11.369 205.131 12.1404 205.131 12.9989C205.131 13.9648 204.863 14.8166 204.327 15.5544C203.803 16.2788 203.032 16.7953 202.012 17.1038L205.212 22.6374H200.805ZM197.565 14.7093H199.517C200.054 14.7093 200.456 14.5818 200.725 14.327C200.993 14.0721 201.127 13.7032 201.127 13.2202C201.127 12.7641 200.986 12.4087 200.705 12.1538C200.436 11.8855 200.041 11.7513 199.517 11.7513H197.565V14.7093Z" fill="black"/><path d="M184.585 22.7783C183.256 22.7783 182.036 22.4697 180.922 21.8527C179.809 21.2222 178.923 20.3569 178.266 19.2569C177.622 18.1435 177.3 16.8892 177.3 15.4941C177.3 14.0989 177.622 12.8513 178.266 11.7513C178.923 10.6379 179.809 9.77265 180.922 9.15557C182.036 8.53849 183.256 8.22995 184.585 8.22995C185.926 8.22995 187.147 8.53849 188.247 9.15557C189.36 9.77265 190.239 10.6379 190.883 11.7513C191.527 12.8513 191.849 14.0989 191.849 15.4941C191.849 16.8892 191.527 18.1435 190.883 19.2569C190.239 20.3569 189.36 21.2222 188.247 21.8527C187.133 22.4697 185.913 22.7783 184.585 22.7783ZM184.585 19.116C185.591 19.116 186.382 18.7874 186.959 18.1301C187.549 17.4727 187.844 16.5941 187.844 15.4941C187.844 14.3672 187.549 13.4818 186.959 12.8379C186.382 12.1806 185.591 11.8519 184.585 11.8519C183.565 11.8519 182.767 12.1806 182.19 12.8379C181.613 13.4818 181.325 14.3672 181.325 15.4941C181.325 16.6075 181.613 17.4929 182.19 18.1502C182.767 18.7941 183.565 19.116 184.585 19.116Z" fill="black"/><path d="M176.324 8.45129V11.5904H172.541V22.6374H168.597V11.5904H164.854V8.45129H176.324Z" fill="black"/><path d="M158.514 22.7783C156.864 22.7783 155.509 22.3892 154.449 21.6112C153.389 20.8197 152.819 19.6929 152.738 18.2307H156.944C156.984 18.727 157.132 19.0892 157.387 19.3173C157.642 19.5453 157.97 19.6593 158.373 19.6593C158.735 19.6593 159.03 19.5721 159.258 19.3978C159.5 19.2099 159.62 18.9551 159.62 18.6331C159.62 18.2173 159.426 17.8953 159.037 17.6672C158.648 17.4392 158.017 17.1843 157.145 16.9026C156.22 16.5941 155.468 16.2989 154.892 16.0172C154.328 15.7221 153.832 15.2995 153.402 14.7495C152.987 14.1861 152.779 13.455 152.779 12.5562C152.779 11.644 153.007 10.866 153.463 10.222C153.919 9.56472 154.549 9.06837 155.354 8.733C156.159 8.39763 157.071 8.22995 158.091 8.22995C159.741 8.22995 161.056 8.61898 162.035 9.39704C163.028 10.1617 163.557 11.2416 163.625 12.6367H159.339C159.325 12.2074 159.191 11.8855 158.936 11.6708C158.695 11.4562 158.379 11.3489 157.99 11.3489C157.695 11.3489 157.454 11.4361 157.266 11.6105C157.078 11.7849 156.984 12.033 156.984 12.355C156.984 12.6233 157.085 12.858 157.286 13.0593C157.501 13.2471 157.762 13.4148 158.071 13.5623C158.379 13.6965 158.835 13.8709 159.439 14.0855C160.338 14.394 161.076 14.7026 161.653 15.0111C162.243 15.3062 162.746 15.7288 163.162 16.2788C163.591 16.8154 163.806 17.4996 163.806 18.3313C163.806 19.1764 163.591 19.9343 163.162 20.6051C162.746 21.2758 162.136 21.8057 161.331 22.1947C160.539 22.5838 159.6 22.7783 158.514 22.7783Z" fill="black"/><path d="M147.041 22.6374L144.224 17.4057H143.802V22.6374H139.858V8.45129H146.075C147.216 8.45129 148.181 8.65252 148.973 9.05496C149.764 9.44399 150.361 9.98729 150.764 10.6849C151.166 11.369 151.367 12.1404 151.367 12.9989C151.367 13.9648 151.099 14.8166 150.563 15.5544C150.039 16.2788 149.268 16.7953 148.249 17.1038L151.448 22.6374H147.041ZM143.802 14.7093H145.753C146.29 14.7093 146.692 14.5818 146.961 14.327C147.229 14.0721 147.363 13.7032 147.363 13.2202C147.363 12.7641 147.222 12.4087 146.941 12.1538C146.672 11.8855 146.277 11.7513 145.753 11.7513H143.802V14.7093Z" fill="#009A7B"/><path d="M129.396 8.45129V16.6813C129.396 17.4459 129.57 18.0362 129.919 18.452C130.281 18.8679 130.824 19.0758 131.549 19.0758C132.273 19.0758 132.817 18.8679 133.179 18.452C133.554 18.0227 133.742 17.4325 133.742 16.6813V8.45129H137.686V16.6813C137.686 17.9825 137.411 19.0959 136.861 20.0215C136.311 20.9337 135.56 21.6246 134.607 22.0941C133.668 22.5502 132.622 22.7783 131.468 22.7783C130.315 22.7783 129.282 22.5502 128.37 22.0941C127.471 21.6246 126.76 20.9337 126.237 20.0215C125.727 19.1093 125.472 17.9959 125.472 16.6813V8.45129H129.396Z" fill="#009A7B"/><path d="M116.495 22.7783C115.167 22.7783 113.946 22.4697 112.833 21.8527C111.72 21.2222 110.834 20.3569 110.177 19.2569C109.533 18.1435 109.211 16.8892 109.211 15.4941C109.211 14.0989 109.533 12.8513 110.177 11.7513C110.834 10.6379 111.72 9.77265 112.833 9.15557C113.946 8.53849 115.167 8.22995 116.495 8.22995C117.837 8.22995 119.058 8.53849 120.158 9.15557C121.271 9.77265 122.15 10.6379 122.794 11.7513C123.437 12.8513 123.759 14.0989 123.759 15.4941C123.759 16.8892 123.437 18.1435 122.794 19.2569C122.15 20.3569 121.271 21.2222 120.158 21.8527C119.044 22.4697 117.823 22.7783 116.495 22.7783ZM116.495 19.116C117.501 19.116 118.293 18.7874 118.87 18.1301C119.46 17.4727 119.755 16.5941 119.755 15.4941C119.755 14.3672 119.46 13.4818 118.87 12.8379C118.293 12.1806 117.501 11.8519 116.495 11.8519C115.476 11.8519 114.678 12.1806 114.101 12.8379C113.524 13.4818 113.235 14.3672 113.235 15.4941C113.235 16.6075 113.524 17.4929 114.101 18.1502C114.678 18.7941 115.476 19.116 116.495 19.116Z" fill="#009A7B"/><path d="M108.483 8.45129L103.493 18.1301V22.6374H99.5288V18.1301L94.5385 8.45129H99.0459L101.541 13.9245L104.036 8.45129H108.483Z" fill="#009A7B"/><path d="M86.4021 8.45129C87.8912 8.45129 89.1924 8.75313 90.3058 9.35679C91.4327 9.94704 92.2979 10.7788 92.9016 11.8519C93.5052 12.9251 93.8071 14.1526 93.8071 15.5343C93.8071 16.9026 93.4985 18.1233 92.8814 19.1965C92.2778 20.2697 91.4125 21.1148 90.2857 21.7319C89.1723 22.3356 87.8777 22.6374 86.4021 22.6374H80.788V8.45129H86.4021ZM86.1003 19.1563C87.254 19.1563 88.1594 18.841 88.8168 18.2105C89.4741 17.5801 89.8028 16.688 89.8028 15.5343C89.8028 14.3672 89.4741 13.4684 88.8168 12.8379C88.1594 12.194 87.254 11.8721 86.1003 11.8721H84.732V19.1563H86.1003Z" fill="black"/><path d="M74.8478 19.6191H79.2545V22.6374H70.9038V8.45129H74.8478V19.6191Z" fill="black"/><path d="M68.6578 8.45129V22.6374H64.7139V8.45129H68.6578Z" fill="black"/><path d="M54.2521 8.45129V16.6813C54.2521 17.4459 54.4265 18.0362 54.7753 18.452C55.1375 18.8679 55.6808 19.0758 56.4051 19.0758C57.1295 19.0758 57.6728 18.8679 58.035 18.452C58.4107 18.0227 58.5985 17.4325 58.5985 16.6813V8.45129H62.5424V16.6813C62.5424 17.9825 62.2674 19.0959 61.7174 20.0215C61.1674 20.9337 60.4162 21.6246 59.4637 22.0941C58.5247 22.5502 57.4783 22.7783 56.3247 22.7783C55.171 22.7783 54.1381 22.5502 53.2258 22.0941C52.3271 21.6246 51.6161 20.9337 51.0929 20.0215C50.5831 19.1093 50.3283 17.9959 50.3283 16.6813V8.45129H54.2521Z" fill="black"/><path d="M45.9437 15.3532C46.7754 15.541 47.4327 15.9569 47.9156 16.6008C48.412 17.2313 48.6602 17.9557 48.6602 18.774C48.6602 19.9813 48.2443 20.927 47.4126 21.6112C46.5809 22.2953 45.4138 22.6374 43.9113 22.6374H36.8887V8.45129H43.69C45.1388 8.45129 46.2723 8.77325 47.0906 9.41716C47.9223 10.0611 48.3382 10.9666 48.3382 12.1337C48.3382 12.9654 48.1169 13.6629 47.6742 14.2264C47.2449 14.7764 46.6681 15.152 45.9437 15.3532ZM40.8326 14.0855H42.8247C43.8174 14.0855 44.3138 13.6764 44.3138 12.858C44.3138 12.0129 43.8174 11.5904 42.8247 11.5904H40.8326V14.0855ZM43.1266 19.4581C44.1193 19.4581 44.6156 19.0423 44.6156 18.2105C44.6156 17.7813 44.4815 17.4526 44.2132 17.2246C43.9583 16.9965 43.5894 16.8825 43.1064 16.8825H40.8326V19.4581H43.1266Z" fill="black"/></svg>';
+  $('tbBrand').innerHTML = BRAND;
+
+  /* ---------------- data (same niches + banners as the previous prototype) ---------------- */
+  const AI_PICK = 'Pet products';
+  const CATEGORIES = [
+    {name:'Pet products',      icon:ICON.paw},
+    {name:'Home &amp; Living', icon:ICON.sofa},
+    {name:'Fitness &amp; Sport', icon:ICON.dumbbell},
+    {name:'Fashion &amp; Apparel', icon:ICON.shirt},
+    {name:'Beauty &amp; Skincare', icon:ICON.sparkles},
+    {name:'Tech &amp; Gadgets', icon:ICON.smartphone},
+    {name:"Let&rsquo;s AI decide", icon:ICON.wand},
+  ];
+  const BANNERS = [
+    {name:'Design 1', img:'images/banner-1.jpg'},
+    {name:'Design 2', img:'images/banner-2.jpg'},
+    {name:'Design 3', img:'images/banner-3.jpg'},
+    {name:'Design 4', img:'images/banner-4.jpg'},
+    {name:'Design 5', img:'images/banner-5.jpg'},
+    {name:'Design 6', img:'images/banner-6.jpg'},
+  ];
+  const STEP_LABEL = {niche:[1,'Niche'], banners:[2,'Homepage design'], store:[3,'Store'], plan:[4,'Shopify plan'], setup:[5,'Store setup'], live:[6,'Store live']};
+
+  const state = {
+    niche:'', aiPicked:false, banners:[], shopify:'none',
+    storeType:'', autods:'', live:false,
+    store:{hero:0}, device:'desktop', zoom:0
+  };
+
+  /* ---------------- chat primitives ---------------- */
+  let beat = 0;
+  function nextDelay(){ const d = Math.max(320, 950 - beat*120); beat++; return d; }
+  function scrollBottom(){ chatcol.scrollTop = chatcol.scrollHeight; }
+  function add(node){ chat.appendChild(node); scrollBottom(); return node; }
+
+  function divider(text, stepKey){
+    add(el(`<div class="divider"><span class="lbl">${text}</span><span class="line"></span></div>`));
+    if(stepKey){
+      const [n,label] = STEP_LABEL[stepKey];
+      $('tbStep').textContent = `Step ${n} of 6 · ${label}`;
+      $('tbStepMobile').textContent = `Step ${n} of 6`;
+    }
+  }
+  async function typing(ms){
+    const row = add(el(`<div class="ai-row"><div class="ai-mark">&#10022;</div><div class="typing"><i></i><i></i><i></i></div></div>`));
+    await sleep(ms);
+    row.remove();
+  }
+  async function ai(html){
+    await typing(nextDelay());
+    return add(el(`<div class="ai-row fade-in"><div class="ai-mark">&#10022;</div><div class="ai-body"><div class="ai-label">AI Assistant</div><div class="ai-text">${html}</div></div></div>`));
+  }
+  async function aiCard(inner){
+    await typing(nextDelay());
+    return add(el(`<div class="ai-row fade-in"><div class="ai-mark">&#10022;</div><div class="ai-body">${inner}</div></div>`));
+  }
+  function you(text){ add(el(`<div class="user-row fade-in"><div class="user-chip">${text}</div></div>`)); }
+  function note(text){ add(el(`<div class="sys-note">${text}</div>`)); }
+
+  /* click-only answers — pills with icons */
+  function askPills(options){
+    return new Promise(resolve=>{
+      const row = el(`<div class="indent pill-row fade-in"></div>`);
+      options.forEach(opt=>{
+        const pill = el(`<button class="pill" type="button">${opt.icon}<span>${opt.name}</span></button>`);
+        pill.addEventListener('click', ()=>{
+          row.querySelectorAll('.pill').forEach(p=>p.disabled=true);
+          pill.classList.add('selected');
+          setTimeout(()=>{ row.remove(); resolve(opt.name); }, 220);
+        });
+        row.appendChild(pill);
+      });
+      add(row);
+    });
+  }
+  function askButtons(labels, kind){
+    return new Promise(resolve=>{
+      const row = el(`<div class="indent btn-row fade-in"></div>`);
+      labels.forEach(l=>{
+        const b = el(`<button class="btn ${kind||'btn-primary'}" type="button">${l}</button>`);
+        b.addEventListener('click', ()=>{ row.remove(); resolve(l); });
+        row.appendChild(b);
+      });
+      add(row);
+      scrollBottom();
+    });
+  }
+  function raceNodes(nodes){
+    return new Promise(resolve=>{
+      let done=false;
+      nodes.forEach(n=>n.addEventListener('click', ()=>{
+        if(done) return; done=true;
+        nodes.forEach(x=>x.disabled=true);
+        resolve(n);
+      }));
+    });
+  }
+  /* homepage design picker — choose exactly two, same as the previous prototype */
+  function askBanners(){
+    return new Promise(resolve=>{
+      const wrap = el(`<div class="indent fade-in">
+          <div class="dir-head"><span class="hint">Choose 2 of 6</span><span class="counter" id="bnCounter">0 of 2 selected</span></div>
+          <div class="dir-grid"></div>
+        </div>`);
+      const grid = wrap.querySelector('.dir-grid');
+      const picked = [];
+      BANNERS.forEach(b=>{
+        const card = el(`<button class="dir-card" type="button" data-name="${b.name}" aria-label="${b.name}">
+            <div class="dir-thumb" style="background-image:url('${b.img}')"></div>
+            <span class="dir-ind">${CHECK}</span>
+          </button>`);
+        card.addEventListener('click', ()=>{
+          const i = picked.indexOf(b);
+          if(i>-1){ picked.splice(i,1); card.classList.remove('selected'); }
+          else { if(picked.length>=2) return; picked.push(b); card.classList.add('selected'); }
+          const c = wrap.querySelector('#bnCounter');
+          c.textContent = `${picked.length} of 2 selected`;
+          c.classList.toggle('full', picked.length===2);
+          grid.querySelectorAll('.dir-card').forEach(x=>x.classList.toggle('disabled', picked.length>=2 && !x.classList.contains('selected')));
+          cont.disabled = picked.length!==2;
+        });
+        grid.appendChild(card);
+      });
+      add(wrap);
+      const row = el(`<div class="indent btn-row fade-in"></div>`);
+      const cont = el(`<button class="btn btn-primary" type="button" disabled>Continue &rarr;</button>`);
+      cont.addEventListener('click', ()=>{
+        wrap.querySelectorAll('.dir-card').forEach(c=>c.disabled=true);
+        row.remove();
+        resolve(picked.slice());
+      });
+      row.appendChild(cont);
+      add(row);
+    });
+  }
+
+  /* ---------------- sidebar / status ---------------- */
+  function setStep(key, cls, value){
+    const li = document.querySelector(`.sb-step[data-step="${key}"]`);
+    li.classList.remove('done','current','upcoming');
+    li.classList.add(cls);
+    li.querySelector('.sb-dot').innerHTML = cls==='done' ? CHECK : '';
+    if(value!==undefined) li.querySelector('.sb-step-value').textContent = value;
+  }
+  function setFact(id, text, empty){
+    const dd = $(id); dd.textContent = text; dd.classList.toggle('empty', !!empty);
+  }
+  function renderShopify(){
+    const slot = $('shopSlot'); slot.innerHTML='';
+    if(state.shopify==='connected'){ slot.appendChild(el(`<span class="shop-status connected"><span class="shop-dot"></span>Shopify · Plan active</span>`)); setFact('fShopify','Plan active',false); }
+    else if(state.shopify==='connecting'){ slot.appendChild(el(`<span class="shop-status connecting"><span class="shop-dot"></span>Shopify · Connecting…</span>`)); setFact('fShopify','Connecting…',false); }
+    else { slot.appendChild(el(`<span class="shop-status"><span class="shop-dot"></span>Shopify · Not active</span>`)); setFact('fShopify','Not active',true); }
+  }
+  function slug(s){ return (s||'yourstore').toLowerCase().replace(/[^a-z0-9]+/g,'').slice(0,22) || 'yourstore'; }
+
+  /* ---------------- overlays ---------------- */
+  async function handoff(url, text, ms){
+    $('handoffUrl').textContent = url;
+    $('handoffText').textContent = text;
+    $('handoff').hidden = false;
+    await sleep(ms);
+    $('handoff').hidden = true;
+  }
+  function modal({title, body, actions}){
+    $('modalTitle').textContent = title;
+    $('modalBody').textContent = body;
+    const wrap = $('modalActions'); wrap.innerHTML='';
+    actions.forEach(a=>{
+      const b = el(`<button class="btn ${a.kind}" type="button">${a.label}</button>`);
+      b.addEventListener('click', ()=>{ $('modalOverlay').hidden=true; a.fn && a.fn(); });
+      wrap.appendChild(b);
+    });
+    $('modalOverlay').hidden = false;
+  }
+  function toast(text){
+    const t = el(`<div class="toast">${CHECK}<span>${text}</span></div>`);
+    document.body.appendChild(t);
+    requestAnimationFrame(()=>t.classList.add('show'));
+    setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(),250); }, 2400);
+  }
+
+  /* ---------------- storefront ---------------- */
+  function dirImages(){
+    const picked = state.banners.length ? state.banners.map(b=>b.img) : [BANNERS[0].img];
+    return picked.concat(BANNERS.map(b=>b.img).filter(i=>!picked.includes(i)));
+  }
+  function renderStore(){
+    const store = $('store');
+    const imgs = dirImages();
+    const hero = imgs[state.store.hero % imgs.length];
+    const name = state.niche || 'Your store';
+    store.className = 'store dir-editorial vp-'+state.device;
+    const products = [
+      {n:'Bestseller',  p:'$24.99'},
+      {n:'New in',      p:'$18.50'},
+      {n:'Staff pick',  p:'$32.00'},
+      {n:'Back in stock', p:'$27.00'},
+    ];
+    const extra = '';
+    store.innerHTML = `
+      <header class="st-nav"><span class="st-logo">${name}</span><nav class="st-links"><span>Shop</span><span>About</span><span>Contact</span></nav><span class="st-cart">Cart (0)</span></header>
+      <section class="st-hero" style="background-image:url('${hero}')"><div class="st-hero-inner">
+        <span class="st-eyebrow">New arrivals</span>
+        <h2 class="st-title">Everything for<br>your ${name.toLowerCase()}</h2>
+        <span class="st-btn">Shop Now</span>
+      </div></section>
+      <section class="st-sec"><div class="st-sec-head"><h3>Featured products</h3><span class="st-link">View all</span></div>
+        <div class="st-products">${products.map((p,idx)=>`<div><div class="st-prod-img" style="background-image:url('${imgs[(idx+1)%imgs.length]}')"></div><div class="st-prod-name">${p.n}</div><div class="st-prod-price">${p.p}</div></div>`).join('')}</div></section>
+      ${extra}
+      <section class="st-sec"><div class="st-sec-head"><h3>Shop by category</h3></div>
+        <div class="st-cats">
+          <div class="st-cat" style="background-image:url('${imgs[0]}')"><span>Living room</span></div>
+          <div class="st-cat" style="background-image:url('${imgs[2%imgs.length]}')"><span>Bedroom</span></div>
+          <div class="st-cat" style="background-image:url('${imgs[4%imgs.length]}')"><span>Kitchen &amp; table</span></div>
+        </div></section>
+      <section class="st-ed"><div class="st-ed-media" style="background-image:url('${imgs[3%imgs.length]}')"></div>
+        <div><span class="st-eyebrow" style="color:var(--st-accent);">Journal</span>
+          <h3>How to layer texture in a small room</h3>
+          <p>Three quiet rules our studio uses when a space needs warmth but not more furniture — plus the pieces we reach for first.</p>
+          <span class="st-link">Read the story &rarr;</span></div></section>
+      <section class="st-news"><h3>Join the list</h3><p>New arrivals, quietly. One email a month, no noise.</p>
+        <div class="st-news-form"><span class="st-input">you@email.com</span><span class="st-sub">Subscribe</span></div></section>
+      <footer class="st-footer">
+        <div class="st-foot-cols">
+          <div><div class="st-foot-logo">${name}</div><p>Considered pieces for everyday rooms. Shipped from our studio, usually within two days.</p></div>
+          <div><div class="st-foot-h">Shop</div><div class="st-foot-links"><span>New arrivals</span><span>Best sellers</span><span>Gift cards</span></div></div>
+          <div><div class="st-foot-h">Help</div><div class="st-foot-links"><span>Shipping</span><span>Returns</span><span>Contact</span></div></div>
+          <div><div class="st-foot-h">Studio</div><div class="st-foot-links"><span>Our story</span><span>Journal</span><span>Stockists</span></div></div>
+        </div>
+        <div class="st-foot-bottom"><span>&copy; ${new Date().getFullYear()} ${name}</span><span>Powered by BuildYourStore</span></div>
+      </footer>`;
+    fitPreview();
+  }
+
+  const DEVICE_W = {desktop:1100, tablet:768, mobile:390};
+  function fitPreview(){
+    const stage = $('pvStage');
+    if(!stage.clientWidth) return;
+    const w = DEVICE_W[state.device];
+    const avail = stage.clientWidth - 40;
+    const fit = Math.min(1, avail / w);
+    const scale = state.zoom ? state.zoom : fit;
+    const scaler = $('scaler'), view = $('browserView'), browser = $('browser');
+    scaler.style.transform = `scale(${scale})`;
+    browser.style.width = (w*scale + 2) + 'px';
+    view.style.width = (w*scale) + 'px';
+    view.style.height = ($('store').scrollHeight * scale) + 'px';
+    $('zoomVal').textContent = state.zoom ? Math.round(scale*100)+'%' : 'Fit';
+    $('zoomOut').disabled = state.zoom !== 0 && state.zoom <= 0.5;
+    $('zoomIn').disabled = state.zoom !== 0 && state.zoom >= 1;
+  }
+  $('deviceSeg').addEventListener('click', e=>{
+    const b = e.target.closest('button[data-device]'); if(!b) return;
+    $('deviceSeg').querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    state.device = b.dataset.device;
+    renderStore();
+  });
+  $('zoomIn').addEventListener('click', ()=>{ state.zoom = Math.min(1, (state.zoom||0.5)+0.25); fitPreview(); });
+  $('zoomOut').addEventListener('click', ()=>{ state.zoom = Math.max(0.25, (state.zoom||1)-0.25); fitPreview(); });
+  $('expandBtn').addEventListener('click', ()=>{
+    const max = frame.classList.toggle('maxpreview');
+    $('expandBtn').textContent = max ? 'Show chat' : 'Expand';
+    setTimeout(fitPreview, 320);
+  });
+  window.addEventListener('resize', fitPreview);
+
+  /* ---------------- the conversation (same steps and copy as the previous prototype) ---------------- */
+  async function run(){
+    /* 01 — niche */
+    divider('01 · Niche', 'niche');
+    await ai('Hey! Let&rsquo;s build your store — first, what do you want to sell?');
+    const pick = await askPills(CATEGORIES);
+    you(pick);
+    state.aiPicked = pick === 'Let&rsquo;s AI decide';
+    state.niche = state.aiPicked ? AI_PICK : pick.replace(/&amp;/g,'&');
+    if(state.aiPicked){
+      await ai(`Happy to pick for you — right now, ${AI_PICK} is converting well for stores like yours. Let&rsquo;s build that.`);
+    }
+    $('tbStoreName').textContent = state.niche;
+    $('tbStoreMeta').textContent = state.aiPicked ? 'Chosen by AI' : state.niche;
+    setFact('fNiche', state.niche, false);
+    setStep('niche','done', state.niche);
+    setStep('banners','current','Choosing');
+
+    /* 02 — banners */
+    divider('02 · Homepage design', 'banners');
+    await ai(`Now the look of your ${state.niche} store — pick your 2 favorites from the 6 designs below. They set how your homepage comes out.`);
+    state.banners = await askBanners();
+    you(state.banners.map(b=>b.name).join(' + '));
+    setFact('fBanners', '2 selected', false);
+    setStep('banners','done','2 selected');
+    setStep('store','current','Building');
+
+    /* 03 — building, with the live preview */
+    divider('03 · Building — live preview', 'store');
+    renderStore();
+    $('browserUrl').textContent = slug(state.niche) + '.myshopify.com';
+    frame.classList.add('split');
+    $('preview').classList.add('in');
+    setTimeout(fitPreview, 340);
+    const [d1, d2] = state.banners.map(b=>b.name);
+    await buildProgress([
+      `<b>Setting up</b> your ${state.niche} store&hellip;`,
+      `<b>Applying</b> ${d1} and ${d2}&hellip;`,
+      '<b>Laying out</b> your homepage&hellip;',
+      '<b>Finishing</b> touches&hellip;'
+    ]);
+    setFact('fDraft','Ready', false);
+    setStep('store','done','Ready');
+    toast('Store draft created');
+
+    /* 04 — preview */
+    divider('04 · Preview', 'store');
+    await ai(`Here&rsquo;s your ${state.niche} store, built from ${d1} and ${d2} — it&rsquo;s live in the preview on the right.`);
+    you(await askButtons(['Looks great, let&rsquo;s continue &rarr;']));
+
+    /* 05 — activate Shopify plan */
+    divider('05 · Activate Shopify plan', 'plan');
+    setStep('plan','current','Not active');
+    await ai(`Your ${state.niche} store is saved. One thing left to make it go live:`);
+    const planCard = await aiCard(`<div class="card">
+        <h3>Approve billing to keep your store</h3>
+        <ul>
+          <li>${CHECK}$1/month for your first 3 months, then $39/month</li>
+          <li>${CHECK}Cancel anytime, directly in Shopify</li>
+        </ul>
+        <button class="btn btn-primary" id="activateBtn" type="button">Activate My Shopify Plan &#8599;</button>
+        <div class="path">
+          <div class="path-node done"><div class="path-circle">${CHECK}</div><div class="path-label">Store created<span>on BuildYourStore</span></div></div>
+          <div class="path-line"></div>
+          <div class="path-node active"><div class="path-circle">${ICON.click}</div><div class="path-label">Activate plan<span>on Shopify</span></div></div>
+          <div class="path-line"></div>
+          <div class="path-node next"><div class="path-circle">${ICON.bag}</div><div class="path-label">Finish setup<span>on BuildYourStore</span></div></div>
+        </div>
+        <div class="card-foot">You&rsquo;ll finish this on Shopify&rsquo;s own secure page — then come right back here and tap Continue.</div>
+      </div>`);
+    await raceNodes([planCard.querySelector('#activateBtn')]);
+    planCard.querySelector('.card').classList.add('spent');
+    state.shopify = 'connecting'; renderShopify();
+    note('&#8599; opened Shopify in a new tab');
+    await handoff('shopify.com/admin/charges','Redirecting to Shopify…',1100);
+    await ai('Welcome back. We can&rsquo;t detect this automatically yet — tap Continue once you&rsquo;ve activated your plan on Shopify.');
+    you(await askButtons(['I&rsquo;ve activated my plan — Continue &rarr;']));
+    state.shopify = 'connected'; renderShopify();
+    setStep('plan','done','Active');
+    await ai(`Got it — your plan is active, so your ${state.niche} store stays online.`);
+    you(await askButtons(['Continue to Store Setup &rarr;']));
+
+    /* 06 — store type upsell / downsell */
+    divider('06 · Store type upsell', 'setup');
+    setStep('setup','current','Choosing');
+    await ai(`Build your ${state.niche} store around one proven product?`);
+    const upCard = await aiCard(`<div class="card">
+        <h3>Build My ${state.niche} Store — <s>$197</s> $97</h3>
+        <ul>
+          <li>${CHECK}1 hand-picked hero product, matched to your niche</li>
+          <li>${CHECK}Expert-designed store, ready in ~24 hours</li>
+          <li>${CHECK}Conversion-optimized copy included</li>
+        </ul>
+        <button class="btn btn-primary" id="upBtn" type="button">Build My ${state.niche} Store — $97</button>
+        <div class="card-foot">Matched to your niche — today only</div>
+      </div>`);
+    const upSkipRow = add(el(`<div class="indent btn-row"><button class="btn btn-ghost" id="upSkip" type="button">No thanks, I&rsquo;ll keep the generic 10-product store</button></div>`));
+    const upChoice = await raceNodes([upCard.querySelector('#upBtn'), $('upSkip')]);
+    upSkipRow.remove();
+    upCard.querySelector('.card').classList.add('spent');
+    if(upChoice.id === 'upBtn'){
+      you(`Build My ${state.niche} Store — $97`);
+      state.storeType = 'Pro ($97)';
+    } else {
+      you('No thanks, I&rsquo;ll keep the generic 10-product store');
+      await ai(`Totally fine — you keep the free 10-product ${state.niche} store either way. Before you go, one last one-time price:`);
+      const downCard = await aiCard(`<div class="card">
+          <h3>Same store, one-time — $47</h3>
+          <ul><li>${CHECK}Identical Pro catalog and theme as the $97 offer</li></ul>
+          <button class="btn btn-primary" id="downBtn" type="button">Build It for $47</button>
+        </div>`);
+      const downSkipRow = add(el(`<div class="indent btn-row"><button class="btn btn-ghost" id="downSkip" type="button">No, I&rsquo;ll keep the free version</button></div>`));
+      const downChoice = await raceNodes([downCard.querySelector('#downBtn'), $('downSkip')]);
+      downSkipRow.remove();
+      downCard.querySelector('.card').classList.add('spent');
+      if(downChoice.id === 'downBtn'){ you('Build It for $47'); state.storeType = 'Pro ($47)'; }
+      else { you('No, I&rsquo;ll keep the free version'); state.storeType = 'Free (10 products)'; }
+    }
+    setFact('fType', state.storeType, false);
+
+    /* 07 — AutoDS trial (soft gate) */
+    divider('07 · AutoDS trial (soft gate)', 'setup');
+    await ai(`One more thing — want us to keep your ${state.niche} catalog stocked automatically?`);
+    const adCard = await aiCard(`<div class="card">
+        <h3>Start your free AutoDS trial</h3>
+        <ul>
+          <li>${CHECK}Free for 3 days</li>
+          <li>${CHECK}Auto-import and restock products for you</li>
+        </ul>
+        <button class="btn btn-primary" id="adBtn" type="button">Start My Free Trial &#8599;</button>
+        <div class="card-foot">Opens AutoDS in a new tab — no card needed to start.</div>
+      </div>`);
+    const adSkipRow = add(el(`<div class="indent btn-row"><button class="btn btn-ghost" id="adSkip" type="button">Skip for now</button></div>`));
+    const adChoice = await raceNodes([adCard.querySelector('#adBtn'), $('adSkip')]);
+    adSkipRow.remove();
+    adCard.querySelector('.card').classList.add('spent');
+    if(adChoice.id === 'adBtn'){
+      you('Start My Free Trial');
+      note('&#8599; opened AutoDS in a new tab');
+      await handoff('autods.com/onboarding','Setting up your trial…',1100);
+      state.autods = 'Started';
+      await ai('Nice — whenever you&rsquo;re ready, just come back and keep going.');
+      you(await askButtons(['Continue &rarr;']));
+    } else {
+      you('Skip for now');
+      state.autods = 'Skipped';
+    }
+    setFact('fAutoDS', state.autods, false);
+    setStep('setup','done', state.storeType);
+
+    /* 08 — store live */
+    divider('08 · Store live', 'live');
+    state.live = true;
+    setStep('live','done','Live');
+    setFact('fDraft','Live', false);
+    const url = slug(state.niche) + '.myshopify.com';
+    $('browserUrl').textContent = url;
+    await aiCard(`<div class="banner success">${CHECK}<span>Your ${state.niche} store is live — ${url}</span></div>`);
+    const extras = [];
+    if(state.storeType.startsWith('Pro')) extras.push(`your ${state.storeType.split(' ')[0]} build is queued — we&rsquo;ll email you when it&rsquo;s ready, usually within 24 hours`);
+    if(state.autods === 'Started') extras.push('your AutoDS trial is running in the background');
+    if(extras.length) await ai(`Also: ${extras.join(', and ')}.`);
+    await ai('A few optional things whenever you&rsquo;re ready — a free domain, more products, help growing. No rush, none of it blocks what you already have.');
+    you(await askButtons(['Got it &rarr;']));
+  }
+
+  /* build checklist in the chat */
+  async function buildProgress(steps){
+    const card = await aiCard(`<div class="work"></div>`);
+    const list = card.querySelector('.work');
+    const rows = steps.map(t=>{
+      const r = el(`<div class="work-item"><span class="work-dot">${CHECK}</span><div class="work-text">${t}</div></div>`);
+      list.appendChild(r);
+      return r;
+    });
+    scrollBottom();
+    for(let i=0;i<rows.length;i++){
+      rows[i].classList.add('active');
+      scrollBottom();
+      await sleep(Math.max(420, 800 - i*80));
+      rows[i].classList.remove('active');
+      rows[i].classList.add('done');
+      if(i===1 || i===3) renderStore();
+    }
+    scrollBottom();
+  }
+
+  /* ---------------- help menu ---------------- */
+  const helpMenu = $('helpMenu');
+  $('helpBtn').addEventListener('click', e=>{ e.stopPropagation(); helpMenu.hidden = !helpMenu.hidden; });
+  document.addEventListener('click', ()=>{ helpMenu.hidden = true; });
+  helpMenu.addEventListener('click', async e=>{
+    const item = e.target.closest('.menu-item'); if(!item) return;
+    helpMenu.hidden = true;
+    if(item.dataset.act==='restart'){
+      modal({title:'Restart the flow?', body:'Your niche, visual directions and generated storefront will be discarded.', actions:[
+        {label:'Cancel', kind:'btn-secondary'},
+        {label:'Restart', kind:'btn-primary', fn:()=>location.reload()}
+      ]});
+    } else if(item.dataset.act==='error'){
+      await aiCard(`<div class="banner error">${ICON.alert}<span>We couldn&rsquo;t finish your storefront.</span></div>`);
+      await ai('Something went wrong while generating the homepage. Your niche and visual directions are saved — nothing was lost. <span class="hint">Reference: BYS-4021</span>');
+      const choice = await askButtons(['Try again','Edit requirements'], 'btn-secondary');
+      you(choice);
+      await ai('Picking things back up where we left off.');
+    } else {
+      modal({title:'Design system', body:'Poppins throughout. Pink #FF0060 for AI and primary actions, green #079B7E for Shopify, #12A64A for success, #E32629 for errors. 8px grid, 8px buttons, 12px cards, borders over shadows.', actions:[{label:'Close', kind:'btn-secondary'}]});
+    }
+  });
+
+  /* ---------------- boot ---------------- */
+  renderShopify();
+  run();
+})();
+</script>

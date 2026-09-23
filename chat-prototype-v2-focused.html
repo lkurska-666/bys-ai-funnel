@@ -1,0 +1,513 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>BYS Chat Prototype V2</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  html,body{height:100%;}
+  [hidden]{display:none !important;}
+  :root{
+    --bg:#FAF6F4;
+    --surface:#FFFFFF;
+    --surface-alt:#F4EDEA;
+    --border:#E9DFDA;
+    --ink:#303030;
+    --ink-soft:#736A67;
+    --ink-faint:#A79E9A;
+    --pink:#FE0161;
+    --pink-tint:#FFE3EE;
+    --pink-tint-strong:#FFC1DA;
+    --teal:#00AD94;
+    --teal-deep:#009A7A;
+    --teal-tint:#E1F5F0;
+    --user-bubble-bg:#303030;
+    --user-bubble-text:#FFFFFF;
+    --shadow: 0 1px 2px rgba(48,32,32,.04), 0 8px 24px -12px rgba(48,32,32,.12);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#1A1616; --surface:#221D1D; --surface-alt:#2A2423; --border:#3A3231;
+      --ink:#F3ECE9; --ink-soft:#B9ADA9; --ink-faint:#877C79;
+      --pink:#FF4785; --pink-tint:#3D1B29; --pink-tint-strong:#552237;
+      --teal:#2BC5A9; --teal-deep:#1FA98F; --teal-tint:#12332C;
+      --user-bubble-bg:#2A2423; --user-bubble-text:#F3ECE9;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#1A1616; --surface:#221D1D; --surface-alt:#2A2423; --border:#3A3231;
+    --ink:#F3ECE9; --ink-soft:#B9ADA9; --ink-faint:#877C79;
+    --pink:#FF4785; --pink-tint:#3D1B29; --pink-tint-strong:#552237;
+    --teal:#2BC5A9; --teal-deep:#1FA98F; --teal-tint:#12332C;
+    --user-bubble-bg:#2A2423; --user-bubble-text:#F3ECE9;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+  }
+
+  *{box-sizing:border-box;}
+  body{background:var(--bg);color:var(--ink);font-family:'Poppins',system-ui,sans-serif;line-height:1.5;margin:0;overflow:hidden;}
+  button{font-family:inherit;}
+  .mono{font-family:'JetBrains Mono',ui-monospace,monospace;}
+
+  .page{height:100vh;display:flex;flex-direction:column;}
+
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 20px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;}
+  .brandmark{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;}
+  .brandmark .dot{width:9px;height:9px;border-radius:50%;background:linear-gradient(135deg,var(--pink),var(--teal));}
+  .brandmark .tag{font-size:10.5px;font-weight:600;color:var(--teal-deep);background:var(--teal-tint);padding:3px 9px;border-radius:100px;text-transform:uppercase;letter-spacing:.04em;}
+  .restart-btn{font-family:'Poppins',sans-serif;font-size:12.5px;font-weight:600;color:var(--ink-soft);background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:7px 14px;cursor:pointer;}
+  .restart-btn:hover{color:var(--ink);border-color:var(--ink-faint);}
+  .restart-btn:focus-visible{outline:2px solid var(--teal);outline-offset:2px;}
+
+  .mockup-shell{
+    display:grid;grid-template-columns:220px 1fr;gap:0;
+    background:var(--surface);
+    flex:1;min-height:0;
+  }
+  .rail{background:var(--surface-alt);padding:20px 16px;display:flex;flex-direction:column;gap:12px;border-right:1px solid var(--border);flex-shrink:0;overflow-y:auto;}
+  .rail-brand{background:#fff;border:1px solid var(--border);border-radius:10px;padding:9px 12px;display:flex;align-items:center;margin-bottom:8px;}
+  .rail-brand svg{height:18px;width:auto;display:block;}
+  .rail .rail-label{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);font-weight:600;margin-bottom:2px;}
+  .rail-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-radius:10px;background:var(--surface);border:1px solid var(--border);font-size:14px;opacity:0;transform:translateY(4px);transition:opacity .3s ease,transform .3s ease,background .25s,border-color .25s;}
+  .rail-item.shown{opacity:1;transform:none;}
+  .rail-item .rk{color:var(--ink-soft);}
+  .rail-item .rv{font-weight:600;color:var(--ink);}
+  .rail-item.pending{border-color:var(--pink-tint-strong);background:var(--pink-tint);}
+  .rail-item.pending .rv{color:var(--pink);}
+  .rail-item.done .rv::after{content:" \2713";color:var(--teal-deep);}
+  .rail-empty{font-size:13.5px;color:var(--ink-faint);font-style:italic;line-height:1.5;}
+  @media (prefers-reduced-motion:reduce){.rail-item{transition:none;}}
+
+  .chatcol{display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--bg);}
+  .chat-topbar{display:flex;align-items:center;gap:10px;padding:14px 24px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--surface);}
+  .ai-avatar{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--teal),var(--pink));display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;flex-shrink:0;}
+  .chat-topbar .name{font-size:15px;font-weight:600;}
+  .chat-topbar .sub{font-size:13px;color:var(--ink-faint);}
+
+  /* single-focus stage: only the current step is ever in the DOM */
+  .chat-body{padding:24px;display:flex;flex-direction:column;overflow-y:auto;flex:1;min-height:0;}
+  .stage-outer{max-width:900px;margin:0 auto;width:100%;flex:1;display:flex;flex-direction:column;justify-content:flex-start;padding-top:56px;}
+  #stageInner{display:flex;flex-direction:column;gap:16px;transition:opacity .22s ease, transform .22s ease;}
+  #stageInner.leaving{opacity:0;transform:translateY(-8px);}
+
+  .msg-row{display:flex;gap:12px;max-width:88%;}
+  .msg-row.ai{align-self:flex-start;}
+  .msg-row.user{align-self:flex-end;flex-direction:row-reverse;max-width:76%;}
+  .avatar-sm{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,var(--teal),var(--pink));flex-shrink:0;margin-top:2px;}
+  .bubble{background:var(--surface);border:1px solid var(--border);border-radius:16px 16px 16px 4px;padding:13px 18px;font-size:17px;line-height:1.5;box-shadow:var(--shadow);}
+  .msg-row.user .bubble{background:var(--user-bubble-bg);color:var(--user-bubble-text);border-radius:16px 16px 4px 16px;border-color:var(--user-bubble-bg);}
+  .typing-bubble{display:inline-flex;background:var(--surface);border:1px solid var(--border);border-radius:16px 16px 16px 4px;padding:14px 18px;}
+  .dots{display:flex;gap:5px;}
+  .dots i{width:7px;height:7px;border-radius:50%;background:var(--ink-faint);display:inline-block;animation:bounce 1.1s infinite ease-in-out;}
+  .dots i:nth-child(2){animation-delay:.15s;} .dots i:nth-child(3){animation-delay:.3s;}
+  @keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.5;}30%{transform:translateY(-3px);opacity:1;}}
+  @media (prefers-reduced-motion:reduce){.dots i{animation:none;} .fb-spinner{animation:none;border-top-color:var(--ink-faint);} #stageInner{transition:none;}}
+
+  .phase-divider{display:flex;align-items:center;gap:10px;margin:0 0 8px;}
+  .phase-divider .pd-label{font-size:12.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--teal-deep);background:var(--teal-tint);padding:5px 12px;border-radius:100px;white-space:nowrap;}
+  .phase-divider .pd-line{flex:1;height:1px;background:var(--border);}
+
+  .sys-divider{align-self:center;font-size:13.5px;color:var(--ink-faint);background:var(--surface-alt);padding:6px 14px;border-radius:100px;}
+
+  .chip-row{display:flex;gap:10px;flex-wrap:wrap;margin-left:38px;}
+  .chip{font-family:'Poppins',sans-serif;font-size:15.5px;font-weight:500;padding:11px 18px;border-radius:100px;border:1px solid var(--border);background:var(--surface);color:var(--ink);cursor:pointer;transition:opacity .2s;}
+  .chip:hover:not(:disabled){border-color:var(--teal);}
+  .chip:focus-visible{outline:2px solid var(--teal);outline-offset:2px;}
+  .chip.primary{border-color:var(--teal);color:var(--teal-deep);background:var(--teal-tint);}
+  .chip:disabled{cursor:default;}
+
+  .banner-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-left:38px;max-width:760px;}
+  .banner-chip{border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--surface);cursor:pointer;padding:0;text-align:left;font-family:inherit;position:relative;line-height:0;}
+  .banner-chip:focus-visible{outline:2px solid var(--teal);outline-offset:2px;}
+  .banner-chip .b-thumb{aspect-ratio:16/9;width:100%;background:var(--surface-alt);background-size:cover;background-position:center;}
+  .banner-chip .b-select{position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:50%;background:rgba(30,26,24,.25);border:2px solid rgba(255,255,255,.9);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;line-height:1;transition:background .2s,border-color .2s;}
+  .banner-chip.selected{border-color:var(--teal);box-shadow:0 0 0 2px var(--teal) inset;}
+  .banner-chip.selected .b-select{background:var(--teal);border-color:var(--teal);}
+
+  .card-bubble{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;box-shadow:var(--shadow);max-width:360px;}
+  .card-bubble h4{font-size:18px;font-weight:600;margin:0 0 10px;line-height:1.3;}
+  .card-bubble ul{margin:0 0 16px;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:8px;}
+  .card-bubble li{font-size:15px;color:var(--ink-soft);padding-left:18px;position:relative;}
+  .card-bubble li::before{content:"\2013";position:absolute;left:0;color:var(--ink-faint);}
+  .btn{display:inline-flex;align-items:center;gap:6px;font-family:'Poppins',sans-serif;font-weight:600;font-size:15.5px;border-radius:10px;padding:12px 18px;border:none;cursor:pointer;width:100%;justify-content:center;}
+  .btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px;}
+  .btn-primary{background:var(--pink);color:#fff;}
+  .card-foot{font-size:12.5px;color:var(--ink-faint);margin-top:12px;text-align:center;}
+
+  /* hero store-preview reveal (step 04) */
+  .store-preview-wrap{width:680px;max-width:100%;}
+  .store-preview{border:1px solid var(--border);border-radius:16px;overflow:hidden;background:var(--surface);box-shadow:0 4px 8px rgba(48,32,32,.06), 0 24px 48px -20px rgba(48,32,32,.22);}
+  .sp-browser-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;background:var(--surface-alt);border-bottom:1px solid var(--border);}
+  .sp-dot{width:8px;height:8px;border-radius:50%;background:var(--border);display:inline-block;}
+  .sp-url{margin-left:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);}
+  .sp-nav{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--border);}
+  .sp-logo{font-weight:700;font-size:15px;letter-spacing:-.01em;}
+  .sp-navlinks{font-size:13.5px;color:var(--ink-soft);}
+  .sp-cart{font-size:16px;}
+  .sp-hero{position:relative;height:220px;background:linear-gradient(135deg,var(--teal-tint),var(--pink-tint));display:flex;align-items:center;padding:0 32px;}
+  .sp-hero-eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--teal-deep);margin-bottom:8px;}
+  .sp-hero-title{font-size:25px;font-weight:700;line-height:1.2;max-width:300px;color:var(--ink);text-wrap:balance;}
+  .sp-hero-cta{display:inline-block;margin-top:16px;background:var(--ink);color:var(--bg);font-size:13.5px;font-weight:600;padding:10px 20px;border-radius:100px;}
+  .sp-products{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:20px 24px;}
+  .sp-product-img{height:80px;border-radius:8px;background:var(--surface-alt);margin-bottom:8px;}
+  .sp-product-img.a{background:linear-gradient(135deg,#FFE3EE,#FFC1DA);}
+  .sp-product-img.b{background:linear-gradient(135deg,#E1F5F0,#C7ECE3);}
+  .sp-product-img.c{background:linear-gradient(135deg,#F4EDEA,#E9DFDA);}
+  .sp-product-name{font-size:13px;font-weight:600;color:var(--ink);}
+  .sp-product-price{font-size:12.5px;color:var(--ink-soft);margin-top:2px;}
+  .sp-caption{font-size:13.5px;color:var(--ink-faint);margin-top:12px;text-align:center;}
+
+  .inline-preview-row{display:flex;gap:14px;margin-left:38px;align-items:flex-start;}
+  .mini-site{width:92px;height:64px;flex-shrink:0;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--surface);box-shadow:var(--shadow);display:flex;flex-direction:column;}
+  .mini-site.big{width:220px;height:130px;}
+  .msite-head{height:12px;background:var(--surface-alt);display:flex;align-items:center;gap:3px;padding:0 5px;flex-shrink:0;}
+  .msite-head i{width:4px;height:4px;border-radius:50%;background:var(--border);display:inline-block;}
+  .msite-hero{flex:1;background:var(--surface-alt);transition:background .4s;}
+  .msite-hero.filled{background:linear-gradient(135deg,var(--teal-tint),var(--pink-tint));}
+  .msite-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:4px;height:16px;flex-shrink:0;}
+  .mini-site.big .msite-grid{height:26px;}
+  .msite-grid span{background:var(--surface-alt);border-radius:3px;transition:background .4s,border-color .4s;}
+  .msite-grid span.filled{background:var(--teal-tint);border:1px solid var(--teal);}
+  .step-text-col{display:flex;flex-direction:column;gap:8px;padding-top:4px;justify-content:center;}
+  .step-text{font-size:15px;color:var(--ink-soft);}
+
+  .handoff-overlay{position:fixed;inset:0;background:rgba(20,16,16,.55);display:flex;align-items:center;justify-content:center;z-index:50;}
+  .fake-browser{width:280px;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+  .fake-browser-bar{background:#ECECEC;padding:8px 10px;display:flex;align-items:center;gap:5px;}
+  .fb-dot{width:7px;height:7px;border-radius:50%;background:#D2D2D2;display:inline-block;}
+  .fb-url{margin-left:6px;font-size:10.5px;color:#666;font-family:'JetBrains Mono',monospace;}
+  .fake-browser-body{padding:30px 18px;display:flex;flex-direction:column;align-items:center;gap:12px;}
+  .fb-spinner{width:24px;height:24px;border-radius:50%;border:3px solid #E4E4E4;border-top-color:#95BF47;animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .fb-text{font-size:12.5px;color:#303030;font-family:'Poppins',sans-serif;text-align:center;}
+
+  .end-note{margin:14px 0 0 38px;font-size:13.5px;color:var(--ink-faint);font-style:italic;}
+
+  @media (max-width:640px){
+    .mockup-shell{grid-template-columns:1fr;height:auto;}
+    .rail{flex-direction:row;flex-wrap:wrap;border-right:none;border-bottom:1px solid var(--border);}
+  }
+</style>
+
+<div class="page">
+  <div class="topbar">
+    <div class="brandmark"><span class="dot"></span> BYS · інтерактивний прототип <span class="tag">V2 · focused</span></div>
+    <button class="restart-btn" id="restartBtn">&#8635; Restart</button>
+  </div>
+
+  <div class="mockup-shell">
+    <div class="rail" id="rail">
+      <div class="rail-brand"><svg viewBox="0 0 216 27" xmlns="http://www.w3.org/2000/svg"><path d="M21.8158 5.5332C23.8708 5.5332 25.5956 7.08195 25.8168 9.125L27.2308 22.2051C27.488 24.585 25.6236 26.6621 23.2299 26.6621H4.02477C1.63106 26.662 -0.233375 24.5849 0.0237967 22.2051L1.43786 9.125C1.65897 7.08195 3.3838 5.53322 5.43884 5.5332H21.8158ZM20.6703 10.3125C19.9757 10.3125 19.4125 10.8757 19.4125 11.5703C19.4124 14.7653 16.8223 17.3555 13.6273 17.3555C10.4324 17.3554 7.84225 14.7652 7.84216 11.5703C7.84216 10.8757 7.27892 10.3125 6.58434 10.3125C5.88994 10.3127 5.32751 10.8759 5.32751 11.5703C5.3276 16.1544 9.04327 19.87 13.6273 19.8701C18.2114 19.8701 21.928 16.1544 21.9281 11.5703C21.9281 10.8758 21.3648 10.3125 20.6703 10.3125ZM9.09997 0C10.2113 2.36362e-05 11.1117 0.901393 11.1117 2.0127C11.1114 3.12378 10.2111 4.02439 9.09997 4.02441C7.98881 4.02441 7.08753 3.12379 7.08727 2.0127C7.08727 0.901379 7.98865 0 9.09997 0ZM18.1547 0C19.266 0 20.1674 0.901379 20.1674 2.0127C20.1671 3.12379 19.2658 4.02441 18.1547 4.02441C17.0436 4.02428 16.1432 3.12371 16.1429 2.0127C16.1429 0.90146 17.0434 0.000132068 18.1547 0Z" fill="#009A7B"/><path d="M210.869 11.6105V13.9245H215.396V16.9227H210.869V19.4782H216V22.6374H206.925V8.45129H216V11.6105H210.869Z" fill="black"/><path d="M200.805 22.6374L197.988 17.4057H197.565V22.6374H193.622V8.45129H199.839C200.98 8.45129 201.945 8.65252 202.737 9.05496C203.528 9.44399 204.125 9.98729 204.528 10.6849C204.93 11.369 205.131 12.1404 205.131 12.9989C205.131 13.9648 204.863 14.8166 204.327 15.5544C203.803 16.2788 203.032 16.7953 202.012 17.1038L205.212 22.6374H200.805ZM197.565 14.7093H199.517C200.054 14.7093 200.456 14.5818 200.725 14.327C200.993 14.0721 201.127 13.7032 201.127 13.2202C201.127 12.7641 200.986 12.4087 200.705 12.1538C200.436 11.8855 200.041 11.7513 199.517 11.7513H197.565V14.7093Z" fill="black"/><path d="M184.585 22.7783C183.256 22.7783 182.036 22.4697 180.922 21.8527C179.809 21.2222 178.923 20.3569 178.266 19.2569C177.622 18.1435 177.3 16.8892 177.3 15.4941C177.3 14.0989 177.622 12.8513 178.266 11.7513C178.923 10.6379 179.809 9.77265 180.922 9.15557C182.036 8.53849 183.256 8.22995 184.585 8.22995C185.926 8.22995 187.147 8.53849 188.247 9.15557C189.36 9.77265 190.239 10.6379 190.883 11.7513C191.527 12.8513 191.849 14.0989 191.849 15.4941C191.849 16.8892 191.527 18.1435 190.883 19.2569C190.239 20.3569 189.36 21.2222 188.247 21.8527C187.133 22.4697 185.913 22.7783 184.585 22.7783ZM184.585 19.116C185.591 19.116 186.382 18.7874 186.959 18.1301C187.549 17.4727 187.844 16.5941 187.844 15.4941C187.844 14.3672 187.549 13.4818 186.959 12.8379C186.382 12.1806 185.591 11.8519 184.585 11.8519C183.565 11.8519 182.767 12.1806 182.19 12.8379C181.613 13.4818 181.325 14.3672 181.325 15.4941C181.325 16.6075 181.613 17.4929 182.19 18.1502C182.767 18.7941 183.565 19.116 184.585 19.116Z" fill="black"/><path d="M176.324 8.45129V11.5904H172.541V22.6374H168.597V11.5904H164.854V8.45129H176.324Z" fill="black"/><path d="M158.514 22.7783C156.864 22.7783 155.509 22.3892 154.449 21.6112C153.389 20.8197 152.819 19.6929 152.738 18.2307H156.944C156.984 18.727 157.132 19.0892 157.387 19.3173C157.642 19.5453 157.97 19.6593 158.373 19.6593C158.735 19.6593 159.03 19.5721 159.258 19.3978C159.5 19.2099 159.62 18.9551 159.62 18.6331C159.62 18.2173 159.426 17.8953 159.037 17.6672C158.648 17.4392 158.017 17.1843 157.145 16.9026C156.22 16.5941 155.468 16.2989 154.892 16.0172C154.328 15.7221 153.832 15.2995 153.402 14.7495C152.987 14.1861 152.779 13.455 152.779 12.5562C152.779 11.644 153.007 10.866 153.463 10.222C153.919 9.56472 154.549 9.06837 155.354 8.733C156.159 8.39763 157.071 8.22995 158.091 8.22995C159.741 8.22995 161.056 8.61898 162.035 9.39704C163.028 10.1617 163.557 11.2416 163.625 12.6367H159.339C159.325 12.2074 159.191 11.8855 158.936 11.6708C158.695 11.4562 158.379 11.3489 157.99 11.3489C157.695 11.3489 157.454 11.4361 157.266 11.6105C157.078 11.7849 156.984 12.033 156.984 12.355C156.984 12.6233 157.085 12.858 157.286 13.0593C157.501 13.2471 157.762 13.4148 158.071 13.5623C158.379 13.6965 158.835 13.8709 159.439 14.0855C160.338 14.394 161.076 14.7026 161.653 15.0111C162.243 15.3062 162.746 15.7288 163.162 16.2788C163.591 16.8154 163.806 17.4996 163.806 18.3313C163.806 19.1764 163.591 19.9343 163.162 20.6051C162.746 21.2758 162.136 21.8057 161.331 22.1947C160.539 22.5838 159.6 22.7783 158.514 22.7783Z" fill="black"/><path d="M147.041 22.6374L144.224 17.4057H143.802V22.6374H139.858V8.45129H146.075C147.216 8.45129 148.181 8.65252 148.973 9.05496C149.764 9.44399 150.361 9.98729 150.764 10.6849C151.166 11.369 151.367 12.1404 151.367 12.9989C151.367 13.9648 151.099 14.8166 150.563 15.5544C150.039 16.2788 149.268 16.7953 148.249 17.1038L151.448 22.6374H147.041ZM143.802 14.7093H145.753C146.29 14.7093 146.692 14.5818 146.961 14.327C147.229 14.0721 147.363 13.7032 147.363 13.2202C147.363 12.7641 147.222 12.4087 146.941 12.1538C146.672 11.8855 146.277 11.7513 145.753 11.7513H143.802V14.7093Z" fill="#009A7B"/><path d="M129.396 8.45129V16.6813C129.396 17.4459 129.57 18.0362 129.919 18.452C130.281 18.8679 130.824 19.0758 131.549 19.0758C132.273 19.0758 132.817 18.8679 133.179 18.452C133.554 18.0227 133.742 17.4325 133.742 16.6813V8.45129H137.686V16.6813C137.686 17.9825 137.411 19.0959 136.861 20.0215C136.311 20.9337 135.56 21.6246 134.607 22.0941C133.668 22.5502 132.622 22.7783 131.468 22.7783C130.315 22.7783 129.282 22.5502 128.37 22.0941C127.471 21.6246 126.76 20.9337 126.237 20.0215C125.727 19.1093 125.472 17.9959 125.472 16.6813V8.45129H129.396Z" fill="#009A7B"/><path d="M116.495 22.7783C115.167 22.7783 113.946 22.4697 112.833 21.8527C111.72 21.2222 110.834 20.3569 110.177 19.2569C109.533 18.1435 109.211 16.8892 109.211 15.4941C109.211 14.0989 109.533 12.8513 110.177 11.7513C110.834 10.6379 111.72 9.77265 112.833 9.15557C113.946 8.53849 115.167 8.22995 116.495 8.22995C117.837 8.22995 119.058 8.53849 120.158 9.15557C121.271 9.77265 122.15 10.6379 122.794 11.7513C123.437 12.8513 123.759 14.0989 123.759 15.4941C123.759 16.8892 123.437 18.1435 122.794 19.2569C122.15 20.3569 121.271 21.2222 120.158 21.8527C119.044 22.4697 117.823 22.7783 116.495 22.7783ZM116.495 19.116C117.501 19.116 118.293 18.7874 118.87 18.1301C119.46 17.4727 119.755 16.5941 119.755 15.4941C119.755 14.3672 119.46 13.4818 118.87 12.8379C118.293 12.1806 117.501 11.8519 116.495 11.8519C115.476 11.8519 114.678 12.1806 114.101 12.8379C113.524 13.4818 113.235 14.3672 113.235 15.4941C113.235 16.6075 113.524 17.4929 114.101 18.1502C114.678 18.7941 115.476 19.116 116.495 19.116Z" fill="#009A7B"/><path d="M108.483 8.45129L103.493 18.1301V22.6374H99.5288V18.1301L94.5385 8.45129H99.0459L101.541 13.9245L104.036 8.45129H108.483Z" fill="#009A7B"/><path d="M86.4021 8.45129C87.8912 8.45129 89.1924 8.75313 90.3058 9.35679C91.4327 9.94704 92.2979 10.7788 92.9016 11.8519C93.5052 12.9251 93.8071 14.1526 93.8071 15.5343C93.8071 16.9026 93.4985 18.1233 92.8814 19.1965C92.2778 20.2697 91.4125 21.1148 90.2857 21.7319C89.1723 22.3356 87.8777 22.6374 86.4021 22.6374H80.788V8.45129H86.4021ZM86.1003 19.1563C87.254 19.1563 88.1594 18.841 88.8168 18.2105C89.4741 17.5801 89.8028 16.688 89.8028 15.5343C89.8028 14.3672 89.4741 13.4684 88.8168 12.8379C88.1594 12.194 87.254 11.8721 86.1003 11.8721H84.732V19.1563H86.1003Z" fill="black"/><path d="M74.8478 19.6191H79.2545V22.6374H70.9038V8.45129H74.8478V19.6191Z" fill="black"/><path d="M68.6578 8.45129V22.6374H64.7139V8.45129H68.6578Z" fill="black"/><path d="M54.2521 8.45129V16.6813C54.2521 17.4459 54.4265 18.0362 54.7753 18.452C55.1375 18.8679 55.6808 19.0758 56.4051 19.0758C57.1295 19.0758 57.6728 18.8679 58.035 18.452C58.4107 18.0227 58.5985 17.4325 58.5985 16.6813V8.45129H62.5424V16.6813C62.5424 17.9825 62.2674 19.0959 61.7174 20.0215C61.1674 20.9337 60.4162 21.6246 59.4637 22.0941C58.5247 22.5502 57.4783 22.7783 56.3247 22.7783C55.171 22.7783 54.1381 22.5502 53.2258 22.0941C52.3271 21.6246 51.6161 20.9337 51.0929 20.0215C50.5831 19.1093 50.3283 17.9959 50.3283 16.6813V8.45129H54.2521Z" fill="black"/><path d="M45.9437 15.3532C46.7754 15.541 47.4327 15.9569 47.9156 16.6008C48.412 17.2313 48.6602 17.9557 48.6602 18.774C48.6602 19.9813 48.2443 20.927 47.4126 21.6112C46.5809 22.2953 45.4138 22.6374 43.9113 22.6374H36.8887V8.45129H43.69C45.1388 8.45129 46.2723 8.77325 47.0906 9.41716C47.9223 10.0611 48.3382 10.9666 48.3382 12.1337C48.3382 12.9654 48.1169 13.6629 47.6742 14.2264C47.2449 14.7764 46.6681 15.152 45.9437 15.3532ZM40.8326 14.0855H42.8247C43.8174 14.0855 44.3138 13.6764 44.3138 12.858C44.3138 12.0129 43.8174 11.5904 42.8247 11.5904H40.8326V14.0855ZM43.1266 19.4581C44.1193 19.4581 44.6156 19.0423 44.6156 18.2105C44.6156 17.7813 44.4815 17.4526 44.2132 17.2246C43.9583 16.9965 43.5894 16.8825 43.1064 16.8825H40.8326V19.4581H43.1266Z" fill="black"/></svg></div>
+      <div class="rail-label">What I know so far</div>
+      <div class="rail-empty" id="railEmpty">Nothing yet — this fills in as we go</div>
+    </div>
+    <div class="chatcol">
+      <div class="chat-topbar">
+        <div class="ai-avatar">&#10022;</div>
+        <div><div class="name">AI Assistant</div><div class="sub">BuildYourStore</div></div>
+      </div>
+      <div class="chat-body" id="chatBody">
+        <div class="stage-outer"><div id="stageInner"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="handoff-overlay" id="handoffOverlay" hidden>
+  <div class="fake-browser">
+    <div class="fake-browser-bar"><span class="fb-dot"></span><span class="fb-dot"></span><span class="fb-dot"></span><span class="fb-url" id="fbUrl">shopify.com/admin/charges</span></div>
+    <div class="fake-browser-body">
+      <div class="fb-spinner"></div>
+      <div class="fb-text" id="fbText">Confirming your Shopify plan&hellip;</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const body = document.getElementById('chatBody');
+  const stageInner = document.getElementById('stageInner');
+  const overlay = document.getElementById('handoffOverlay');
+  let beat = 0;
+
+  function nextDelay(){
+    const d = Math.max(280, 900 - beat*110);
+    beat++;
+    return d;
+  }
+  function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+  function el(html){ const t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstElementChild; }
+  function scrollBottom(){ body.scrollTop = body.scrollHeight; }
+  function add(node){ stageInner.appendChild(node); scrollBottom(); return node; }
+
+  /* single-focus stage: everything currently on screen belongs to one phase.
+     Starting a new phase clears the previous one (after a short beat so the
+     user's last answer is still readable) instead of appending to a growing log. */
+  async function clearStage(){
+    if (stageInner.children.length){
+      await sleep(450);
+      stageInner.classList.add('leaving');
+      await sleep(220);
+      stageInner.innerHTML = '';
+      stageInner.classList.remove('leaving');
+    }
+  }
+  async function divider(text){
+    await clearStage();
+    add(el(`<div class="phase-divider"><span class="pd-label">${text}</span><span class="pd-line"></span></div>`));
+  }
+
+  async function aiTyping(ms){
+    const row = add(el(`<div class="msg-row ai"><div class="avatar-sm"></div><div class="typing-bubble"><div class="dots"><i></i><i></i><i></i></div></div></div>`));
+    await sleep(ms);
+    row.remove();
+  }
+  async function aiMsg(html){
+    await aiTyping(nextDelay());
+    add(el(`<div class="msg-row ai"><div class="avatar-sm"></div><div class="bubble">${html}</div></div>`));
+  }
+  async function aiCard(innerHtml){
+    await aiTyping(nextDelay());
+    return add(el(`<div class="msg-row ai"><div class="avatar-sm"></div>${innerHtml}</div>`));
+  }
+  function userMsg(text){
+    add(el(`<div class="msg-row user"><div class="avatar-sm" style="visibility:hidden"></div><div class="bubble">${text}</div></div>`));
+  }
+  function waitForChoice(options){
+    return new Promise(resolve=>{
+      const row = el(`<div class="chip-row"></div>`);
+      options.forEach(opt=>{
+        const chip = el(`<button class="chip" type="button">${opt}</button>`);
+        chip.addEventListener('click', ()=>{
+          row.querySelectorAll('.chip').forEach(c=>c.disabled=true);
+          row.remove();
+          resolve(opt);
+        });
+        row.appendChild(chip);
+      });
+      add(row);
+    });
+  }
+  function waitForBanners(){
+    return new Promise(resolve=>{
+      const wrap = el(`<div class="banner-grid"></div>`);
+      const names=['Banner 1','Banner 2','Banner 3','Banner 4','Banner 5','Banner 6'];
+      const images=['images/banner-1.jpg','images/banner-2.jpg','images/banner-3.jpg','images/banner-4.jpg','images/banner-5.jpg','images/banner-6.jpg'];
+      const selected = [];
+      names.forEach((name, i)=>{
+        const chip = el(`<button class="banner-chip" type="button" aria-label="${name}"><div class="b-thumb" style="background-image:url('${images[i]}')"></div><span class="b-select"></span></button>`);
+        chip.addEventListener('click', ()=>{
+          const idx = selected.indexOf(name);
+          if(idx>-1){
+            selected.splice(idx,1);
+            chip.classList.remove('selected');
+            chip.querySelector('.b-select').textContent = '';
+          } else {
+            if(selected.length>=2) return;
+            selected.push(name);
+            chip.classList.add('selected');
+            chip.querySelector('.b-select').textContent = '✓';
+          }
+          contBtn.disabled = selected.length!==2;
+          contBtn.classList.toggle('primary', selected.length===2);
+          contBtn.style.opacity = selected.length===2 ? '1' : '.4';
+        });
+        wrap.appendChild(chip);
+      });
+      add(wrap);
+      const contRow = el(`<div class="chip-row"></div>`);
+      const contBtn = el(`<button class="chip" type="button" disabled style="opacity:.4;">Continue →</button>`);
+      contBtn.addEventListener('click', ()=>{
+        contRow.remove();
+        resolve(selected.slice());
+      });
+      contRow.appendChild(contBtn);
+      add(contRow);
+    });
+  }
+
+  let previewRow = null;
+  async function previewStep(text, {hero, grid}={}){
+    await aiTyping(nextDelay());
+    if(!previewRow){
+      previewRow = el(`<div class="inline-preview-row"><div class="mini-site"><div class="msite-head"><i></i><i></i><i></i></div><div class="msite-hero"></div><div class="msite-grid"><span></span><span></span><span></span></div></div><div class="step-text-col"></div></div>`);
+      add(previewRow);
+    }
+    if(hero) previewRow.querySelector('.msite-hero').classList.add('filled');
+    if(grid) previewRow.querySelectorAll('.msite-grid span').forEach(s=>s.classList.add('filled'));
+    previewRow.querySelector('.step-text-col').appendChild(el(`<div class="step-text">${text}</div>`));
+    scrollBottom();
+  }
+
+  const rail = document.getElementById('rail');
+  function raceButtonVsChip(buttonEl, chipLabels){
+    return new Promise(resolve=>{
+      const row = el(`<div class="chip-row"></div>`);
+      const chips = chipLabels.map(label=>{
+        const chip = el(`<button class="chip" type="button">${label}</button>`);
+        row.appendChild(chip);
+        return chip;
+      });
+      add(row);
+      let done = false;
+      function finish(kind, label){
+        if (done) return;
+        done = true;
+        buttonEl.disabled = true;
+        chips.forEach(c=>c.disabled=true);
+        row.remove();
+        resolve({ kind, label });
+      }
+      buttonEl.addEventListener('click', ()=>finish('button', buttonEl.textContent), {once:true});
+      chips.forEach(chip=>{
+        chip.addEventListener('click', ()=>finish('chip', chip.textContent));
+      });
+    });
+  }
+
+  async function showHandoff(urlLabel, statusText, ms){
+    document.getElementById('fbUrl').textContent = urlLabel;
+    document.getElementById('fbText').textContent = statusText;
+    overlay.hidden = false;
+    await sleep(ms);
+    overlay.hidden = true;
+  }
+
+  const railEmpty = document.getElementById('railEmpty');
+  function addRailItem(id, key, value, pending){
+    if(railEmpty) railEmpty.remove();
+    const item = el(`<div class="rail-item ${pending?'pending':'done'}" id="rail-${id}"><span class="rk">${key}</span><span class="rv">${value}</span></div>`);
+    rail.appendChild(item);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>item.classList.add('shown')));
+  }
+  function resolveRailItem(id, value){
+    const item = document.getElementById('rail-'+id);
+    item.classList.remove('pending');
+    item.classList.add('done');
+    item.querySelector('.rv').textContent = value;
+  }
+
+  async function run(){
+    await divider('01 · Niche');
+    await aiMsg('Hey! Let’s build your store — first, what do you want to sell?');
+    const niche = await waitForChoice(['Pet products','Home & Living','Fitness & Sport','Fashion & Apparel','Beauty & Skincare','Tech & Gadgets','Not sure yet']);
+    userMsg(niche);
+    addRailItem('niche', 'Niche', niche);
+
+    await divider('02 · Banners');
+    await aiMsg(`Good pick. Here are a few homepage looks for a ${niche} store — choose two:`);
+    const banners = await waitForBanners();
+    userMsg(banners.join(' + '));
+    addRailItem('banners', 'Banners', banners.length+' selected');
+
+    await divider('03 · Building — live preview');
+    await previewStep('“Applying your niche…”');
+    await previewStep('“Adding your banners…”', {hero:true});
+    await previewStep('“Laying out your homepage…”', {grid:true});
+    await previewStep('“Finishing touches…” ✓');
+    addRailItem('store', 'Store draft', 'Ready');
+
+    await divider('04 · Preview');
+    await aiMsg('Here’s a first look at your store 👀');
+    const nicheSlug = niche.toLowerCase().replace(/[^a-z0-9]+/g, '') || 'yourstore';
+    await aiCard(`<div class="store-preview-wrap">
+        <div class="store-preview">
+          <div class="sp-browser-bar"><span class="sp-dot"></span><span class="sp-dot"></span><span class="sp-dot"></span><span class="sp-url">${nicheSlug}.myshopify.com</span></div>
+          <div class="sp-nav"><span class="sp-logo">${niche}</span><span class="sp-navlinks">Shop · About · Contact</span><span class="sp-cart">🛒</span></div>
+          <div class="sp-hero">
+            <div>
+              <div class="sp-hero-eyebrow">New arrivals</div>
+              <div class="sp-hero-title">Everything for your ${niche.toLowerCase()}</div>
+              <div class="sp-hero-cta">Shop Now</div>
+            </div>
+          </div>
+          <div class="sp-products">
+            <div><div class="sp-product-img a"></div><div class="sp-product-name">Bestseller</div><div class="sp-product-price">$24.99</div></div>
+            <div><div class="sp-product-img b"></div><div class="sp-product-name">New in</div><div class="sp-product-price">$18.50</div></div>
+            <div><div class="sp-product-img c"></div><div class="sp-product-name">Staff pick</div><div class="sp-product-price">$32.00</div></div>
+          </div>
+        </div>
+        <div class="sp-caption">${niche} store · draft, not yet live</div>
+      </div>`);
+    await waitForChoice(['Looks great, let’s continue →']).then(userMsg);
+
+    await divider('05 · Activate Shopify plan');
+    await aiMsg('One thing left to make it go live:');
+    addRailItem('plan', 'Shopify plan', 'Not active', true);
+    const card = await aiCard(`<div class="card-bubble">
+        <h4>Approve billing to keep your store</h4>
+        <ul><li>$1/month for your first 3 months, then $39/month</li><li>Cancel anytime, directly in Shopify</li></ul>
+        <button class="btn btn-primary" id="activateBtn" type="button">Activate My Shopify Plan ↗</button>
+        <div class="card-foot">You’ll finish this on Shopify’s own secure page.</div>
+      </div>`);
+    await new Promise(resolve=>{
+      card.querySelector('#activateBtn').addEventListener('click', resolve, {once:true});
+    });
+    add(el(`<div class="sys-divider">↗ opened Shopify in a new tab</div>`));
+    await showHandoff('shopify.com/admin/charges', 'Confirming your Shopify plan…', 1500);
+    await aiTyping(600);
+    await aiMsg('✅ Your Shopify plan is active. Your store can go live.');
+    resolveRailItem('plan', 'Active');
+    await waitForChoice(['Continue to Store Setup →']).then(userMsg);
+
+    await divider('06 · Store type upsell');
+    await aiMsg(`Build your ${niche} store around one proven product?`);
+    const upsellCard = await aiCard(`<div class="card-bubble" style="max-width:300px;">
+        <h4>Build My ${niche} Store — <s style="color:var(--ink-faint);font-weight:400;">$197</s> $97</h4>
+        <ul>
+          <li>1 hand-picked hero product, matched to your niche</li>
+          <li>Expert-designed store, ready in ~24 hours</li>
+          <li>Conversion-optimized copy included</li>
+        </ul>
+        <button class="btn btn-primary" id="upsellBtn" type="button">Build My ${niche} Store — $97</button>
+        <div class="card-foot">Matched to your niche — today only</div>
+      </div>`);
+    const upsell = await raceButtonVsChip(upsellCard.querySelector('#upsellBtn'), [`No thanks, I'll keep the generic 10-product store`]);
+    userMsg(upsell.label);
+
+    if (upsell.kind === 'button') {
+      addRailItem('storeType', 'Store type', 'Pro ($97)');
+    } else {
+      await aiMsg('Totally fine — before you go, one last one-time price:');
+      const downsellCard = await aiCard(`<div class="card-bubble" style="max-width:280px;">
+          <h4>Same store, one-time — $47</h4>
+          <ul><li>Identical Pro catalog and theme as the $97 offer</li></ul>
+          <button class="btn btn-primary" id="downsellBtn" type="button">Build It for $47</button>
+        </div>`);
+      const downsell = await raceButtonVsChip(downsellCard.querySelector('#downsellBtn'), ["No, I'll keep the free version"]);
+      userMsg(downsell.label);
+      addRailItem('storeType', 'Store type', downsell.kind === 'button' ? 'Pro ($47)' : 'Free (10 products)');
+    }
+
+    await divider('07 · AutoDS trial (soft gate)');
+    await aiMsg('One more thing — want us to keep your catalog stocked automatically?');
+    const autodsCard = await aiCard(`<div class="card-bubble" style="max-width:280px;">
+        <h4>Start your free AutoDS trial</h4>
+        <ul><li>Free for 3 days</li><li>Auto-import and restock products for you</li></ul>
+        <button class="btn btn-primary" id="autodsBtn" type="button">Start My Free Trial ↗</button>
+        <div class="card-foot">Opens AutoDS in a new tab — no card needed to start.</div>
+      </div>`);
+    const autods = await raceButtonVsChip(autodsCard.querySelector('#autodsBtn'), ['Skip for now']);
+    userMsg(autods.label);
+    if (autods.kind === 'button') {
+      add(el(`<div class="sys-divider">↗ opened AutoDS in a new tab</div>`));
+      await showHandoff('autods.com/onboarding', 'Setting up your trial…', 1100);
+      await aiMsg('Nice — whenever you\'re ready, just come back and keep going.');
+      addRailItem('autods', 'AutoDS trial', 'Started');
+    } else {
+      addRailItem('autods', 'AutoDS trial', 'Skipped');
+    }
+    await waitForChoice(['Continue →']).then(userMsg);
+
+    await divider('08 · Store live');
+    resolveRailItem('store', 'Live');
+    await aiMsg('🎉 Your store is live!');
+    await aiMsg(`A few optional things whenever you're ready — a free domain, more products, help growing. No rush, none of it blocks what you already have.`);
+    await waitForChoice(['Got it →']).then(userMsg);
+
+    add(el(`<div class="end-note">— end of demo segment —</div>`));
+  }
+
+  document.getElementById('restartBtn').addEventListener('click', ()=>location.reload());
+  run();
+})();
+</script>

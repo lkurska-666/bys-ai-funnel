@@ -1,0 +1,15 @@
+# the pre-merge snapshots — a local rollback point, not something to publish
+backups/
+
+# the local preview server
+serve.py
+
+# working notes and the decision log: internal, and not for a public repository
+CONTEXT.md
+HANDOFF.md
+references/
+
+# scratch
+.DS_Store
+.playwright-mcp/
+mob-01.png

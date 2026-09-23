@@ -1,0 +1,2556 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>BYS Funnel — mobile</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+<style>
+/* ==========================================================================
+   Tokens — mirrored 1:1 from the Figma file (BYS-Chat-funnel)
+   Primitives → Semantic, same names as the variable collections.
+   ========================================================================== */
+:root{
+  /* primitives — neutral ramp from the reference palette */
+  --gray-50:#F9FAFB;  --gray-100:#F3F4F6; --gray-200:#E5E7EB; --gray-300:#D1D5DB;
+  --gray-400:#9CA3AF; --gray-500:#6B7280; --gray-600:#4B5563; --gray-700:#374151;
+  --gray-800:#1F2937; --gray-900:#111827;
+  --white:#FFFFFF;
+  --pink-800:#D80052; --pink-900:#FE0161; --pink-950:#AD0042;
+  --teal-300:#009A7B; --teal-400:#007B60; --teal-600:#006950; --teal-1000:#041B20;
+  --green-600:#16A34A; --green-900:#14532D; --green-50:#F0FDF4;
+  --sky-50:#F0F9FF; --sky-600:#0284C7; --sky-900:#0C4A6E;
+  --amber-50:#FFFBEB; --amber-600:#D97706; --amber-900:#5E4200;
+  --red-600:#DC2626;  --red-700:#B91C1C;  --red-50:#FEF2F2;
+  --accent-turquoise:#4BD8E2; --accent-lime:#15FA11; --accent-lemon:#E8FA11;
+
+  /* alpha ramps — foreground / primary with baked alpha */
+  --fg-alpha-4:rgba(17,24,39,.04);
+  --fg-alpha-8:rgba(17,24,39,.08);
+  --fg-alpha-48:rgba(17,24,39,.48);
+  --primary-alpha-8:rgba(254,1,97,.08);
+  --primary-alpha-48:rgba(254,1,97,.48);
+  --primary-alpha-80:rgba(254,1,97,.8);
+
+  /* semantic */
+  --background:var(--white);
+  --foreground:var(--gray-900);
+  --card:var(--white);
+  --card-foreground:var(--gray-900);
+  --primary:var(--pink-900);
+  --primary-hover:var(--pink-800);
+  --primary-active:var(--pink-950);
+  --primary-foreground:var(--white);
+  --secondary:var(--gray-900);
+  --secondary-hover:var(--gray-800);
+  --secondary-foreground:var(--white);
+  --muted:var(--gray-100);
+  --muted-foreground:var(--gray-500);
+  --accent:var(--gray-100);
+  --accent-hover:var(--gray-200);
+  --accent-foreground:var(--gray-900);
+  --destructive:var(--red-600);
+  --destructive-muted:var(--red-50);
+  --card-muted:var(--gray-50);
+  --border:var(--gray-200);
+  --border-strong:var(--gray-300);
+  --ring:var(--pink-900);
+  --success:var(--green-600);
+  --info:var(--sky-600); --info-muted:var(--sky-50); --info-foreground:var(--sky-900);
+  --warning:var(--amber-600); --warning-muted:var(--amber-50); --warning-foreground:var(--amber-900);
+  --success-muted:var(--green-50);
+  --brand:var(--teal-300);
+  --brand-hover:var(--teal-400);
+  --brand-foreground:var(--white);
+
+  /* spacing / radius */
+  --space-xs:4px; --space-sm:8px; --space-md:12px; --space-lg:16px;
+  --space-xl:24px; --space-2xl:32px; --space-3xl:48px; --space-4xl:64px;
+  --radius-sm:4px; --radius-md:8px; --radius-lg:12px; --radius-xl:16px; --radius-full:9999px;
+
+  /* effect styles */
+  --shadow-small:0 1px 4px var(--fg-alpha-4);
+  --shadow-medium:0 4px 16px var(--fg-alpha-8);
+  --focus-ring:0 0 0 4px var(--primary-alpha-8);
+}
+
+*{box-sizing:border-box;}
+html,body{height:100%;}
+[hidden]{display:none !important;}
+body{
+  margin:0; background:var(--background); color:var(--foreground);
+  font-family:'Poppins',system-ui,sans-serif; overflow:hidden;
+}
+button{font-family:inherit;}
+:focus-visible{outline:none; box-shadow:var(--focus-ring);}
+
+/* ---------- text styles (the 7 local styles from Figma) ---------- */
+.t-body-default     {font-size:16px; font-weight:400; line-height:24px;}
+.t-body-default-emph{font-size:16px; font-weight:500; line-height:24px;}
+.t-body-small        {font-size:14px; font-weight:400; line-height:20px;}
+.t-label-assistant   {font-size:14px; font-weight:600; line-height:20px; letter-spacing:1px; text-transform:uppercase;}
+.t-label-section     {font-size:12px; font-weight:600; line-height:18px; letter-spacing:1px; text-transform:uppercase;}
+.t-caption           {font-size:12px; font-weight:400; line-height:18px;}
+.t-caption-emph      {font-size:12px; font-weight:600; line-height:18px;}
+/* Body/Link — underlined text that acts as a button: the skips, "I want another name".
+   Same 16/24 as Body/Default on purpose, so a link never reads as a smaller class of
+   thing than the sentence above it. */
+.t-body-link         {font-size:16px; font-weight:400; line-height:24px;
+  text-decoration:underline; text-underline-offset:3px;}
+
+/* ---------- background wash (Background/Glow) ---------- */
+.blobs{position:fixed; inset:0; overflow:hidden; pointer-events:none; z-index:0;}
+.blob{position:absolute; border-radius:50%;}
+.blob--turquoise{width:536px; height:536px; right:-276px; top:-44px; background:var(--accent-turquoise); filter:blur(250px);}
+.blob--lime{width:346px; height:346px; left:190px; top:-174px; background:var(--accent-lime); filter:blur(200px);}
+.blob--lemon{width:288px; height:288px; left:-68px; top:524px; background:var(--accent-lemon); filter:blur(200px);}
+
+/* ---------- shell ---------- */
+.app{position:relative; z-index:1; height:100vh; display:flex; flex-direction:column;}
+.nav{height:64px; flex-shrink:0; display:flex; align-items:center; gap:var(--space-lg); padding:0 var(--space-2xl);}
+.nav-logo svg{height:24px; width:auto; display:block;}
+.nav-spacer{flex:1;}
+.account{display:flex; align-items:center; gap:var(--space-sm);}
+.account-avatar{width:32px; height:32px; border-radius:var(--radius-full); background:var(--brand); color:var(--brand-foreground); display:flex; align-items:center; justify-content:center;}
+.account-avatar svg{width:18px; height:18px;}
+.account-name{color:var(--foreground);}
+.account-chevron{width:12px; height:12px; color:var(--foreground);}
+.ghost-btn{height:32px; padding:0 12px; border-radius:var(--radius-md); border:1px solid transparent; background:transparent; color:var(--muted-foreground); font-size:12.5px; font-weight:500; cursor:pointer;}
+.ghost-btn:hover{color:var(--foreground); border-color:var(--border);}
+.ghost-btn.on{color:var(--primary); border-color:var(--primary-alpha-48);}
+
+.stage{flex:1; min-height:0; overflow-y:auto; padding:24px 32px 64px;}
+.chat{width:100%; max-width:882px; margin:0 auto;}
+
+/* ---------- section divider (Label/Section) ---------- */
+.divider{display:flex; align-items:center; gap:14px; margin:32px 0 20px;}
+.divider:first-child{margin-top:0;}
+.divider span{color:var(--muted-foreground); white-space:nowrap;}
+.divider i{flex:1; height:1px; background:var(--border);}
+
+/* ---------- assistant row ---------- */
+/* A turn guarantees its own air above it. Adjacent margins collapse in the chat column,
+   so this reads as a minimum, not an addition: after a normal 20px block it stays 20,
+   and after a block with its own tight bottom edge — the spent CTA row at 8px, the domain
+   list at 0 — it still gets 20 instead of sticking to it. */
+.ai-row{display:flex; gap:var(--space-sm); align-items:flex-start; margin:20px 0;}
+.ai-avatar{width:32px; height:32px; border-radius:var(--radius-full); background:var(--card); box-shadow:var(--shadow-small);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+.ai-avatar svg{width:18px; height:18px;}
+.ai-body{min-width:0;}
+.ai-label{color:var(--muted-foreground); margin-bottom:4px;}
+.ai-bubble{background:var(--card); border:1px solid var(--border); border-radius:14px;
+  padding:12px 16px; max-width:556px; box-shadow:var(--shadow-small); color:var(--card-foreground);}
+
+/* assistant status: Typing / Thinking / Slow */
+.status{display:flex; flex-direction:column; gap:var(--space-xs); padding:6px 0;}
+.status-row{display:flex; align-items:center; gap:var(--space-sm);}
+.status-row svg{width:20px; height:20px; color:var(--muted-foreground);}
+.status-label{color:var(--muted-foreground);}
+.status-note{color:var(--muted-foreground);}
+.dots{display:flex; gap:5px; padding:7px 0;}
+.dots i{width:6px; height:6px; border-radius:50%; background:var(--muted-foreground); animation:blink 1.2s infinite ease-in-out;}
+.dots i:nth-child(2){animation-delay:.2s;}
+.dots i:nth-child(3){animation-delay:.4s;}
+@keyframes blink{0%,80%,100%{opacity:.25;} 40%{opacity:1;}}
+.shimmer-text{animation:pulse 1.6s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;} 50%{opacity:.55;}}
+
+/* ---------- user reply ---------- */
+.user-row{display:flex; justify-content:flex-end; margin-bottom:20px;}
+.user-bubble{background:var(--secondary); color:var(--secondary-foreground); border-radius:14px; padding:10px 16px; max-width:70%;}
+
+/* ---------- answer pills ---------- */
+.pill-rows{display:flex; flex-wrap:wrap; gap:var(--space-sm); margin:0 0 20px 40px;}
+.pill{display:inline-flex; align-items:center; gap:var(--space-sm); height:44px; padding:0 18px;
+  border:1px solid var(--border-strong); border-radius:var(--radius-full); background:var(--background);
+  color:var(--foreground); cursor:pointer; box-shadow:var(--shadow-small);
+  font-size:16px; font-weight:500; line-height:24px; transition:border-color 150ms, color 150ms, background 150ms;}
+.pill svg{width:17px; height:17px; flex-shrink:0;}
+.pill img{width:20px; height:20px; display:block; flex-shrink:0;}
+.pill:hover{border-color:var(--gray-400);}
+.pill.selected{border:2px solid var(--primary); color:var(--primary); padding:0 17px;}
+.pill:disabled{cursor:default;}
+.pill:disabled:not(.selected){opacity:.45;}
+
+/* ---------- design cards ---------- */
+.indent{margin-left:40px;}
+.choose-row{display:flex; align-items:baseline; justify-content:space-between; width:844px; max-width:100%; margin:0 0 8px 40px;}
+.choose-row .hint{color:var(--muted-foreground);}
+.counter{color:var(--muted-foreground);}
+.counter.full{color:var(--primary);}
+.card-grid{display:grid; grid-template-columns:repeat(3, 276px); gap:var(--space-sm); margin:0 0 20px 40px; width:844px; max-width:100%;}
+.design-card{position:relative; width:276px; height:130px; padding:0; border:1px solid var(--border-strong);
+  border-radius:var(--radius-md); overflow:hidden; cursor:pointer; background:var(--card) center/cover no-repeat;
+  box-shadow:var(--shadow-small); transition:border-color 150ms;}
+.design-card:hover{border-color:var(--gray-400);}
+.design-card.selected{border:2px solid var(--primary);}
+.design-card .badge{position:absolute; top:8px; right:8px; width:20px; height:20px; border-radius:50%;
+  background:var(--card); border:1px solid var(--border-strong); color:transparent;
+  display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; line-height:18px;}
+.design-card.selected .badge{background:var(--primary); border-color:var(--primary); color:var(--primary-foreground);}
+.design-card:disabled{cursor:default;}
+.design-card:disabled:not(.selected){opacity:.5;}
+
+/* ---------- button (Figma component: 44px, radius/full) ---------- */
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:var(--space-sm);
+  height:44px; padding:0 var(--space-xl); border:none; border-radius:var(--radius-full);
+  background:var(--primary); color:var(--primary-foreground); cursor:pointer;
+  font-size:16px; font-weight:500; line-height:24px; transition:background 150ms;}
+.btn svg{width:20px; height:20px;}
+.btn:hover{background:var(--primary-hover);}
+.btn:active{background:var(--primary-active);}
+.btn:disabled{background:var(--primary-alpha-48); cursor:not-allowed;}
+.btn-row{display:flex; gap:var(--space-md); margin:0 0 20px 40px;}
+
+/* ---------- preview skeleton ---------- */
+.skeleton{background:var(--card); border:1px solid var(--border);
+  border-radius:var(--radius-lg); box-shadow:var(--shadow-small); overflow:hidden; margin:0 0 20px 40px;}
+.sk-chrome{display:flex; align-items:center; gap:var(--space-xs); padding:12px 16px; background:var(--background);}
+.sk-chrome .sk-dot{width:8px; height:8px; border-radius:50%; background:var(--muted);}
+.sk-nav{display:flex; align-items:center; justify-content:space-between; padding:16px 20px;}
+.sk-links{display:flex; gap:var(--space-md);}
+.sk-hero{padding:24px 20px; display:flex; flex-direction:column; gap:var(--space-sm);}
+.sk-products{display:grid; grid-template-columns:repeat(3,1fr); gap:var(--space-md); padding:0 20px 24px;}
+.sk-cell{display:flex; flex-direction:column; gap:var(--space-xs);}
+.sk{position:relative; overflow:hidden; background:var(--muted); border-radius:var(--radius-sm);}
+.sk::after{content:''; position:absolute; inset:0; transform:translateX(-100%);
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.7), transparent);
+  animation:shimmer 1.4s infinite;}
+@keyframes shimmer{100%{transform:translateX(100%);}}
+.sk--url{width:180px; height:10px; border-radius:var(--radius-full); margin-left:6px;}
+.sk--logo{width:96px; height:12px;}
+.sk--link{width:40px; height:8px;}
+.sk--link.wide{width:48px;}
+.sk--hero{height:190px; border-radius:var(--radius-md);}
+.sk--line-lg{width:280px; height:14px;}
+.sk--line-sm{width:180px; height:10px;}
+.sk--img{height:90px; border-radius:var(--radius-md);}
+.sk--cap{width:90px; height:8px;}
+.sk--cap.short{width:56px;}
+
+/* ---------- states reference (prototype affordance) ---------- */
+.states-ref{margin:0 0 20px 40px; display:flex; flex-direction:column; gap:var(--space-lg);}
+.state-item{display:flex; align-items:flex-start; gap:var(--space-xl);}
+.state-item .demo{min-width:280px;}
+.state-item .meta{color:var(--muted-foreground); padding-top:4px;}
+
+/* ---------- handoff sheet ---------- */
+.handoff{position:fixed; inset:0; background:rgba(17,24,39,.45); display:flex; align-items:center; justify-content:center; z-index:60;}
+.sheet{width:320px; background:var(--card); border:1px solid var(--border); border-radius:var(--radius-lg);
+  overflow:hidden; box-shadow:var(--shadow-medium);}
+.sheet-bar{display:flex; align-items:center; gap:5px; padding:10px 12px; background:var(--card-muted); border-bottom:1px solid var(--border);}
+.sheet-bar i{width:7px; height:7px; border-radius:50%; background:var(--border-strong);}
+.sheet-url{margin-left:8px; color:var(--muted-foreground); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.sheet-body{padding:28px 20px; display:flex; flex-direction:column; align-items:center; gap:var(--space-md); text-align:center;}
+.sheet-spin{width:22px; height:22px; border-radius:50%; border:2.5px solid var(--border); border-top-color:var(--primary); animation:spin .8s linear infinite;}
+
+/* ---------- Shopify plan step ---------- */
+.offer{margin:0 0 12px 40px; max-width:480px; background:var(--card); border:1px solid var(--border);
+  border-radius:var(--radius-xl); box-shadow:var(--shadow-medium); overflow:hidden;}
+.offer-top{padding:var(--space-xl); display:flex; flex-direction:column; gap:var(--space-md);}
+.offer-pitch{min-width:0; display:flex; flex-direction:column; gap:var(--space-md);}
+.offer-sub{color:var(--muted-foreground); margin:0;}
+.cta-row{display:flex; align-items:center; gap:var(--space-lg); margin:24px 0 8px 40px; flex-wrap:wrap;}
+.cta-reassure{display:inline-flex; align-items:center; gap:var(--space-sm); color:var(--foreground);}
+.cta-reassure svg{width:16px; height:16px; flex-shrink:0; stroke:var(--success); stroke-width:2.5;}
+/* Title/Default — the one size above Body, shared by a sheet title and an offer headline.
+   Her call: 24/32, the same as the modal title, so the two stop being separate sizes. */
+.offer-title{font-size:24px; font-weight:600; line-height:32px; letter-spacing:-.02em;}
+.offer-ladder{color:var(--muted-foreground); margin-top:2px;}
+.price{display:flex; align-items:baseline; gap:var(--space-sm); flex-wrap:wrap;}
+.price-now{font-size:32px; font-weight:700; line-height:40px; letter-spacing:-.02em;}
+.price-unit{color:var(--muted-foreground);}
+.price-then{color:var(--muted-foreground);}
+.save-chip{display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:var(--radius-full);
+  background:var(--success-muted); color:var(--green-900); border:1px solid rgba(22,163,74,.25);}
+.save-chip svg{width:13px; height:13px; stroke:var(--success); stroke-width:3;}
+.benefits{display:flex; flex-direction:column; gap:var(--space-sm); margin:0; padding:0; list-style:none;}
+.benefits li{display:flex; gap:var(--space-sm); align-items:flex-start; color:var(--foreground);}
+.benefits svg{width:16px; height:16px; flex-shrink:0; margin-top:2px; stroke:var(--success); stroke-width:2.5;}
+
+/* 3-node path */
+.path{display:flex; align-items:flex-start; padding:var(--space-lg) var(--space-xl) 0; background:var(--card-muted);}
+.path-node{flex:1; position:relative; display:flex; flex-direction:column; align-items:flex-start; text-align:left; gap:10px;}
+/* the connector runs from one circle to the next, not as a stub in the flow between two
+   nodes — a node is 1/3 of the row but its circle is only 40px, so a stub in the gap sits
+   nowhere near the circle it leaves. 4px of overlap at each end, and the circles paint on
+   top of it, so the join is seamless whatever the row width. */
+.path-node + .path-node::before{content:''; position:absolute; top:20px; left:calc(-100% + 36px);
+  width:calc(100% - 32px); height:1px; background:var(--border);}
+.path-circle{position:relative; z-index:1;
+  width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  transition:background-color 320ms ease;}
+.path-circle svg{width:18px; height:18px; stroke-width:2;}
+.path-node.done .path-circle{background:var(--success); color:var(--white);}
+.path-node.active .path-circle{background:var(--teal-1000); color:var(--white);}
+.path-node.next .path-circle{background:var(--card); border:1px solid var(--border-strong); color:var(--muted-foreground);}
+.path-circle--mark svg{width:17px; height:17px;}
+.path-label{font-size:14px; font-weight:600; line-height:20px;}
+.path-label span{display:block; font-weight:400; color:var(--muted-foreground);}
+.path-foot{padding:var(--space-lg) var(--space-xl) var(--space-xl); background:var(--card-muted); color:var(--muted-foreground);}
+
+/* trust row + disclosure */
+.trust{display:flex; flex-wrap:wrap; gap:var(--space-lg); margin:0 0 8px 40px; color:var(--muted-foreground);}
+.trust span{display:inline-flex; align-items:center; gap:6px;}
+.trust svg{width:14px; height:14px;}
+.asks{display:flex; flex-direction:column; gap:var(--space-sm); margin:0 0 20px 40px; max-width:600px;}
+.disclosure{max-width:600px;}
+.disclosure summary{cursor:pointer; color:var(--muted-foreground); display:inline-flex; align-items:center; gap:6px; list-style:none;}
+.disclosure summary::-webkit-details-marker{display:none;}
+.disclosure summary svg{width:14px; height:14px; transition:transform 150ms;}
+.disclosure[open] summary svg{transform:rotate(180deg);}
+.disclosure p{margin:8px 0 0; color:var(--muted-foreground);}
+
+/* waiting for the return leg */
+.btn-link{background:none; border:none; padding:0; color:var(--muted-foreground); cursor:pointer; text-decoration:underline; text-underline-offset:3px;}
+.btn-link:hover{color:var(--foreground);}
+.waiting{margin:0 0 20px 40px; display:flex; flex-direction:column; gap:var(--space-md);}
+.waiting-row{display:flex; align-items:center; gap:var(--space-sm); color:var(--muted-foreground);}
+.waiting-row.done{color:var(--foreground); font-weight:500;}
+.waiting-row.done svg{width:16px; height:16px; stroke:var(--success); stroke-width:2.5; flex-shrink:0;}
+.waiting-row .spin{width:14px; height:14px; border-radius:50%; border:2px solid var(--border);
+  border-top-color:var(--primary); animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.banner{display:flex; align-items:center; gap:var(--space-sm); margin:0 0 20px 40px; padding:12px 16px;
+  border-radius:var(--radius-lg); background:var(--success-muted); border:1px solid rgba(22,163,74,.35); color:var(--green-900);}
+.banner svg{width:16px; height:16px; stroke:var(--success); stroke-width:2.5; flex-shrink:0;}
+.btn-ghost{background:transparent; color:var(--muted-foreground); border:1px solid var(--border-strong);}
+.btn-ghost:hover{background:var(--card); color:var(--foreground);}
+
+/* ---------- payment modal ----------
+   The only place in the funnel where the user types. That is not a break with the
+   no-typing rule but the exception the rule already allows: a card number is
+   inherently a typed value, the same reason the domain step gets a real field. */
+.modal-back{position:fixed; inset:0; z-index:30; background:var(--fg-alpha-48);
+  display:flex; align-items:center; justify-content:center; padding:var(--space-2xl);}
+.modal{width:632px; max-width:100%; max-height:100%; overflow-y:auto;
+  background:var(--card); border-radius:var(--radius-xl); box-shadow:var(--shadow-medium);
+  padding:var(--space-2xl);}
+.modal-head{display:flex; align-items:center; gap:var(--space-lg); margin-bottom:var(--space-xl);}
+.modal-title{flex:1; text-align:left; font-size:24px; font-weight:600; line-height:32px;}
+.modal-close{width:32px; height:32px; border:none; background:none; border-radius:var(--radius-md);
+  color:var(--muted-foreground); cursor:pointer; display:flex; align-items:center; justify-content:center;}
+.modal-close:hover{background:var(--accent); color:var(--foreground);}
+.modal-close svg{width:18px; height:18px;}
+.modal-item{display:flex; align-items:center; gap:var(--space-lg); padding:var(--space-lg);
+  background:var(--card-muted); border-radius:var(--radius-lg); margin-bottom:var(--space-xl);}
+.modal-item img{width:120px; border-radius:var(--radius-sm); display:block;}
+.modal-item-body{flex:1; min-width:0;}
+.modal-item-name{margin-bottom:var(--space-xs);}
+.modal-price{text-align:right; flex-shrink:0;}
+.modal-price b{display:block;}
+.modal-foot{display:flex; align-items:center; justify-content:center; gap:6px;
+  margin-top:var(--space-md); color:var(--muted-foreground);}
+.modal-foot svg{width:14px; height:14px;}
+
+/* form control — mirrors the Input / Dropdown components in Figma */
+.field{display:flex; flex-direction:column; gap:var(--space-sm); margin-bottom:var(--space-lg);}
+.field-row{display:flex; gap:var(--space-lg);}
+.field-row .field{flex:1; min-width:0;}
+.field-label{font-size:14px; font-weight:500; line-height:20px;}
+.control{height:44px; display:flex; align-items:center; gap:10px; padding:0 var(--space-md);
+  background:var(--card); border:1px solid var(--border-strong); border-radius:var(--radius-md);}
+.control:focus-within{border-color:var(--ring); box-shadow:var(--focus-ring);}
+.control svg{width:20px; height:20px; stroke:var(--muted-foreground); flex-shrink:0;}
+/* the wrapper carries the focus ring, so the field inside must not draw its own: the
+   universal :focus-visible rule was giving it a second one, invisible while the two
+   agreed and plainly visible in the error state, where .control suppresses its own and
+   the inner ring was left glowing inside the red border. */
+.control input, .control select{flex:1; min-width:0; border:none; outline:none; background:none;
+  box-shadow:none; font-family:inherit; font-size:16px; line-height:24px; color:var(--foreground);}
+.control input::placeholder{color:var(--muted-foreground);}
+.control input[readonly]{cursor:default;}
+.control select{color:var(--muted-foreground); appearance:none; cursor:pointer;}
+
+/* ---------- 06 · store type: production's two-card comparison, in the column ---------- */
+.types{display:flex; flex-direction:column; gap:var(--space-sm); margin:0 0 20px 40px;}
+.type{display:flex; flex-direction:column; gap:var(--space-xl);
+  padding:var(--space-xl); border-radius:var(--radius-lg);
+  background:var(--card-muted); border:1px solid var(--border);}
+.type--pro{position:relative; overflow:hidden; background:var(--background);
+  border-color:var(--ring); box-shadow:var(--shadow-medium);}
+.type-body{display:flex; align-items:flex-start; gap:var(--space-xl);}
+.type-col{flex:1; min-width:0; display:flex; flex-direction:column; gap:var(--space-lg);}
+.type-shot{flex:0 0 364px;}
+.type-shot img{display:block; width:100%; height:auto; border-radius:var(--radius-md);}
+/* corner ribbon: measured, not guessed — below this the band's visible chord is
+   shorter than the label and clips it */
+.ribbon{position:absolute; top:30px; right:-46px; width:180px; text-align:center; padding:4px 0;
+  transform:rotate(45deg); background:var(--primary); color:var(--primary-foreground);
+  letter-spacing:.2px;}
+.type-name{padding-right:var(--space-2xl);}
+.type-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:12px;}
+.type-list li{display:flex; align-items:flex-start; gap:var(--space-sm);}
+.type-list svg{width:16px; height:16px; flex-shrink:0; margin-top:2px; stroke-width:2;}
+.type-list li.yes svg{stroke:var(--success);}
+.type-list li.no{color:var(--muted-foreground);}
+.type-list li.no svg{stroke:var(--destructive);}
+/* no storefront picture exists for either type, so each card is identified by one
+   icon instead: an even grid of products, against one large panel with small ones
+   under it. Shape only — no text, no brand colour. */
+.type-head{display:flex; align-items:center; gap:var(--space-md);}
+.type-icon{width:40px; height:40px; border-radius:var(--radius-md); flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--card); color:var(--muted-foreground);}
+.type-icon svg{width:20px; height:20px;}
+.type--pro .type-icon{background:var(--primary-alpha-80); color:var(--primary-foreground);}
+.type-price{display:flex; align-items:baseline; gap:var(--space-xs); flex-wrap:wrap; color:var(--foreground);}
+.type-price s{color:var(--muted-foreground);}
+
+/* ---------- secondary action + offer meta ---------- */
+.btn-secondary{background:var(--card); color:var(--foreground); border:1px solid var(--border-strong);}
+.btn-secondary:hover{background:var(--accent); color:var(--accent-foreground);}
+.btn-secondary:active{background:var(--accent-hover);}
+.btn-secondary:disabled{background:var(--card); border-color:var(--border); color:var(--fg-alpha-48);}
+.offer-meta{display:flex; flex-direction:column; gap:var(--space-sm); margin:0; padding:0; list-style:none;}
+.offer-meta li{display:flex; gap:var(--space-sm); align-items:flex-start; color:var(--foreground);}
+.offer-meta svg{width:16px; height:16px; flex-shrink:0; margin-top:3px; stroke:var(--success); stroke-width:2.5;}
+.offer.spent{opacity:.55;}
+
+/* ---------- the build moment ----------
+   Full screen, deliberately. The preview loader was kept inside the column because a
+   takeover would have broken the chat metaphor for 3.5s of nothing; this is the one
+   long wait with real work behind it, so it gets the screen. The chat underneath is
+   hidden entirely — the wash is redrawn here so nothing shows through. */
+/* ---------- the build, as part of the conversation ----------
+   It used to take the whole screen. Her manager's call: in an AI chat the work belongs in
+   the transcript, where it stays afterwards as a record of what was done. */
+.working{margin:0 0 20px 40px; display:flex; flex-direction:column; gap:var(--space-md);}
+.working-head{display:flex; align-items:center; gap:var(--space-sm); padding:0; border:0;
+  background:none; font-family:inherit; text-align:left; color:inherit; cursor:default;}
+.working-ic{display:flex; width:18px; height:18px; flex-shrink:0;}
+.working-ic svg{width:18px; height:18px; color:var(--muted-foreground);}
+.working-ic .tick{display:none;}
+/* the icons inherit their colour from the svg, so the tick has to be coloured there */
+.working-ic .tick svg{color:var(--success); stroke-width:2.5;}
+/* finished, the list folds into its own header — the record stays, the bulk does not */
+.working-meta, .working-chev{display:none;}
+.working-meta{color:var(--muted-foreground);}
+.working-chev svg{width:14px; height:14px; color:var(--muted-foreground); transition:transform 150ms;}
+.working.done .working-head{cursor:pointer;}
+.working.done .working-ic .brain{display:none;}
+.working.done .working-ic .tick{display:block;}
+.working.done .working-meta, .working.done .working-chev{display:flex;}
+.working.done .working-list{display:none;}
+.working.done.open .working-list{display:flex;}
+.working.done.open .working-chev svg{transform:rotate(180deg);}
+/* the rule hangs from the centre of the 18px icon above it */
+.working-list{display:flex; flex-direction:column; gap:12px;
+  margin-left:9px; padding-left:19px; border-left:1px solid var(--border);}
+.working-row{display:flex; align-items:center; gap:var(--space-sm);}
+.working-mk{width:16px; height:16px; flex-shrink:0; display:flex; align-items:center; justify-content:center;}
+.working-mk i{width:14px; height:14px; border-radius:50%; box-sizing:border-box; border:1.5px solid var(--border-strong);}
+.working-mk svg{display:none; width:16px; height:16px; stroke:var(--success); stroke-width:2.5;}
+.working-row.active .working-mk i{border-color:var(--border); border-top-color:var(--primary);
+  animation:spin .8s linear infinite;}
+.working-row.done .working-mk i{display:none;}
+.working-row.done .working-mk svg{display:block;}
+/* the steps are supporting text under the header: one weight, one colour, the same
+   Body/Small + muted-foreground pairing the progress pill and the path nodes use */
+.working-label{color:var(--muted-foreground); min-width:0;}
+
+/* ---------- 07 · what AutoDS is ----------
+   Nobody arriving here has heard of AutoDS, so the card explains the product rather
+   than the procedure: what it does for them, then what it costs. Measured off
+   372:25278: the artwork bleeds to the card edge, so the card carries no padding of
+   its own and the body holds its 24px. 411 + 24 + 405 is exactly the 842 the chat
+   gives a block at this indent — no wrapper frame around the image. */
+.autods{display:flex; align-items:center; gap:var(--space-xl); margin:0 0 20px 40px;
+  width:842px; max-width:100%; overflow:hidden; border-radius:var(--radius-lg);
+  background:var(--card); border:1px solid var(--border);}
+.autods-shot{flex:0 0 411px; max-width:50%; display:block; height:auto;}
+.autods-body{flex:1; min-width:0; display:flex; flex-direction:column; gap:var(--space-lg);
+  padding:var(--space-xl) var(--space-xl) var(--space-xl) 0;}
+.autods-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:12px;}
+.autods-list li{display:flex; align-items:center; gap:var(--space-sm);}
+/* Lucide at the design's 20px. The default 1.75 stroke on a 24 viewBox lands at
+   ~1.46px here, which is where the set in the design file draws them. */
+.autods-list svg{width:20px; height:20px; flex-shrink:0; display:block; color:var(--brand);}
+.autods-price{display:flex; flex-direction:column; gap:var(--space-xs);
+  padding-top:var(--space-lg); border-top:1px solid var(--border);}
+.autods-price .then{color:var(--muted-foreground);}
+
+/* ---------- 06b · the downsell ----------
+   Measured off 413:6132. Same 842 skeleton as the AutoDS card, but the art is one
+   flattened export rather than a CSS composition — the storefront fragment, the
+   finished-work card and the proof chip are baked into `Container_downsell.png`, so
+   there is one asset to keep in step with Figma instead of three positioned layers.
+   The picture argues "already done"; the heading and the ribbon carry the offer. */
+.pro{position:relative; display:flex; align-items:center; gap:var(--space-xl); margin:0 0 20px 40px;
+  width:842px; max-width:100%; overflow:hidden; border-radius:var(--radius-lg);
+  /* the same ring and shadow the Pro card wears on the store-type step — it is the same
+     offer, so it should not arrive looking like a different class of thing */
+  background:var(--card); border:1px solid var(--ring); box-shadow:var(--shadow-medium);}
+/* the export is 411×352 and must stay at that size: as a flex item with a stretched
+   cross size a replaced element grows on both axes, which quietly widened it to 420 */
+.pro-art{flex:0 0 auto; align-self:center; display:block;
+  width:411px; max-width:50%; height:auto;}
+.pro-body{flex:1; min-width:0; display:flex; flex-direction:column; gap:var(--space-xl);
+  padding:var(--space-xl) var(--space-xl) var(--space-xl) 0;}
+.pro-top{display:flex; flex-direction:column; gap:var(--space-xl);}
+/* Body/Default Emphasis, like every other card heading — the design had it at 600,
+   which would have been a ninth weight for one line of text */
+.pro-head{padding-right:var(--space-3xl);}
+.pro-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:var(--space-md);}
+.pro-list li{display:flex; align-items:center; gap:var(--space-sm);}
+.pro-list svg{width:20px; height:20px; flex-shrink:0; color:var(--brand);}
+.pro-price{display:flex; flex-direction:column; gap:var(--space-sm);
+  padding-top:var(--space-lg); border-top:1px solid var(--border);}
+.pro-now{display:flex; align-items:center; gap:var(--space-md); flex-wrap:wrap;}
+.pro-pair{display:flex; align-items:center; gap:var(--space-xs);}
+/* the old price is struck through in primary, not grey — the strike is the thing
+   being pointed at, so it carries the accent rather than receding with the number */
+.pro-was{position:relative; color:var(--muted-foreground);}
+.pro-was::after{content:''; position:absolute; left:0; right:0; top:52%; height:1px; background:var(--primary);}
+/* the clock has an object: it is not "hurry", it is the price being held */
+.pro-clock{display:inline-flex; align-items:center; gap:6px; padding:5px 12px;
+  border-radius:var(--radius-full); background:var(--primary-alpha-8); color:var(--primary);
+  white-space:nowrap;}
+.pro-clock svg{width:15px; height:15px;}
+.pro-clock b{font-weight:600; font-variant-numeric:tabular-nums;}
+.pro-terms{color:var(--muted-foreground);}
+/* when it runs out the card has to give the price back, because unlike a landing page
+   this one stays in the transcript. A countdown that lapses and changes nothing is the
+   bluff we took out of this step in the first place. */
+.pro.is-over .ribbon{display:none;}
+.pro.is-over .pro-was{display:none;}
+.pro.is-over .pro-clock{background:var(--muted); color:var(--muted-foreground);}
+.pro.is-over .pro-art{filter:saturate(.45);}
+
+/* the seven-step manual. Production prints it on the page, above a disabled
+   "Complete the instruction to continue"; in a chat that is a wall in the middle of
+   a conversation, so it sits behind a link and opens over the transcript for
+   whoever gets stuck on AutoDS's own screens. */
+.guide{list-style:none; counter-reset:g; margin:0; padding:0;
+  display:flex; flex-direction:column; gap:var(--space-xl);}
+.guide li{counter-increment:g; display:flex; flex-direction:column; gap:var(--space-md);}
+/* the number hangs in the gutter rather than sitting in a flex row — a flex row
+   would make the bolded button names their own items and space them out */
+.guide p{margin:0; position:relative; padding-left:28px;}
+.guide p::before{content:counter(g) "."; position:absolute; left:0; top:0;
+  color:var(--muted-foreground);}
+.guide b{font-weight:500;}
+/* the box is reserved before the file arrives — without it each screenshot that
+   loads shifts the list and the browser's scroll anchoring drags the modal down.
+   1344/656 is the shots' own ratio: the production frame is 672×278 and stretches
+   them ~15% taller than they are, which is an artefact of the paste, not a choice. */
+.guide img{display:block; width:100%; height:auto; aspect-ratio:1344/656;
+  border-radius:var(--radius-md); border:1px solid var(--border);}
+/* the list is taller than the modal, so the title stays put while it passes — and so
+   does the way out: the button is the last step, and nobody should have to scroll back
+   through four screenshots to reach it */
+/* the modal always opens at step one. Without this the browser's scroll anchoring
+   keeps its own idea of where the content was and lands partway down the list. */
+.modal--guide{overflow-anchor:none;}
+.modal--guide .modal-head{position:sticky; top:calc(var(--space-2xl) * -1); z-index:1;
+  margin:calc(var(--space-2xl) * -1) calc(var(--space-2xl) * -1) var(--space-xl);
+  padding:var(--space-2xl) var(--space-2xl) var(--space-lg); background:var(--card);}
+.modal--guide .modal-go{position:sticky; bottom:calc(var(--space-2xl) * -1); z-index:1;
+  margin:var(--space-xl) calc(var(--space-2xl) * -1) calc(var(--space-2xl) * -1);
+  padding:var(--space-lg) var(--space-2xl) var(--space-2xl); background:var(--card);
+  border-top:1px solid var(--border);}
+
+/* ---------- 08 · store live ----------
+   Measured off 229:13948. A short preview rather than step 04's tall scrolling one —
+   the store has been seen already, so this is a reminder, not a reveal. The product
+   cards hang past the bottom edge, which is why they live outside the (clipping)
+   preview rather than inside it. */
+.live-view{position:relative; height:320px; overflow:hidden; background:var(--card);}
+.live-view > img{display:block; width:100%; height:auto;}
+/* The stack, taken off 229:16513 tile by tile. Four squares of 94, each with its own offset and
+   tilt — the row is uneven on purpose. Every number here is read from the design, not chosen:
+   x 0 / 91.8 / 165.4 / 250.9, y 9.5 / 0.4 / 5.9 / 0.4, tilt 5.8 / -5.3 / 1.7 / -5.3,
+   radius 12.16, shadow 0 3.6 9.7 rgba(0,0,0,.18). Placed a quarter in from the left of the
+   storefront, over the lower half of the hero, as the design places it. */
+.live-products{position:absolute; left:24%; top:57%; width:344px; height:103px;}
+/* the photos already carry their own white card and rounded corners, so the only thing added
+   here is the shadow — as a drop-shadow, so it follows the cut-out instead of boxing it */
+.live-card{position:absolute; width:94px; height:94px; display:block;
+  filter:drop-shadow(0 3.6px 9.7px rgba(0,0,0,.18));}
+.live-card--a{left:0;       top:9.5px; transform:rotate(5.8deg);}
+.live-card--b{left:91.8px;  top:0.4px; transform:rotate(-5.3deg);}
+.live-card--c{left:165.4px; top:5.9px; transform:rotate(1.7deg);}
+/* the counter is the one tile we draw, so it needs the card the photos already have */
+.live-more{left:250.9px; top:0.4px; transform:rotate(-5.3deg);
+  background:var(--card); border-radius:12.16px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;}
+/* the design sets "+7" in Bold; our scale has no Bold, so SemiBold — and foreground, not the
+   design's pure black, which this system never uses */
+.live-more b{font-size:18px; font-weight:600; line-height:18px; color:var(--foreground);}
+.live-more span{font-size:14px; font-weight:400; line-height:20px; color:var(--foreground);}
+.howto{margin:0 0 20px 40px; width:556px; max-width:100%; padding:var(--space-lg);
+  border-radius:var(--radius-lg); background:var(--info-muted);
+  display:flex; flex-direction:column; gap:var(--space-sm);}
+.howto-path{color:var(--foreground);}
+.howto-path u{text-underline-offset:3px;}
+
+/* ---------- 10 · domain ----------
+   Carried from the embedded app's three-phase step, with one inversion: the
+   suggestions come first and the field only opens on request. */
+/* the reassurance lines sit inside the assistant's own bubble now, not in a card
+   of their own — so they read as part of what it is saying */
+.bub-list{display:flex; flex-direction:column; gap:var(--space-sm);
+  margin-top:var(--space-sm); padding-bottom:var(--space-sm);}
+.bub-list div{display:flex; align-items:center; gap:var(--space-sm);}
+.bub-list svg{width:20px; height:20px; flex-shrink:0; stroke:var(--primary);}
+
+.dom-list{margin:0 0 0 40px; width:556px; max-width:100%; padding:0;
+  border-radius:var(--radius-lg); background:var(--card); border:1px solid var(--border);}
+.dom-row{display:flex; align-items:center; justify-content:space-between; gap:var(--space-lg);
+  padding:var(--space-md) 20px;}
+.dom-row + .dom-row{border-top:1px solid var(--border);}
+.dom-get{height:32px; padding:0 var(--space-md); border:none; border-radius:var(--radius-full);
+  background:var(--primary); color:var(--primary-foreground); cursor:pointer;
+  font-family:inherit; font-size:14px; font-weight:500;}
+.dom-get:hover{background:var(--primary-hover);}
+/* A suggestion can fail. Availability is only true at the moment it is checked, so a
+   name listed as free thirty seconds ago can be gone by the time it is clicked — and
+   the merchant has to be told which one and why, on the row itself, rather than by the
+   list quietly vanishing. Same destructive treatment as the typed field's error. */
+.dom-row.err{background:var(--destructive-muted);}
+.dom-row.err .dom-name{color:var(--destructive);}
+.dom-taken{display:inline-flex; align-items:center; gap:6px; color:var(--destructive);}
+.dom-taken svg{width:16px; height:16px; stroke:var(--destructive); stroke-width:2.2;}
+.dom-get:disabled{background:var(--muted); color:var(--muted-foreground); cursor:default;}
+
+/* After a failed check the choice has to come back BELOW the explanation: the chat runs
+   downward, and live rows left sitting above the reply mean scrolling back up to act. One
+   block — the name that died, the ones still free, and the open field. */
+.dom-retry{margin:0 0 20px 40px; width:556px; max-width:100%;
+  display:flex; flex-direction:column; gap:var(--space-md);}
+.dom-retry .dom-list{margin:0; width:auto;}
+.dom-retry.err .control, .dom-retry.err .control:focus-within{
+  border-color:var(--destructive); box-shadow:none;}
+
+.dom-other{margin:16px 0 20px 40px;}
+.dom-other button{background:none; border:none; padding:0; cursor:pointer; font-family:inherit;
+  color:var(--primary);}
+.dom-other button:hover{color:var(--primary-hover);}
+.dom-field{margin:0 0 20px 40px; width:556px; max-width:100%;
+  display:flex; flex-direction:column; gap:var(--space-sm);}
+/* the same field without a label of its own — the assistant has just asked the question,
+   so repeating it above the box would say it twice */
+.ask-field{margin:0 0 20px 40px; width:556px; max-width:100%;
+  display:flex; flex-direction:column; align-items:flex-start; gap:var(--space-sm);}
+.dom-input{display:flex; gap:var(--space-md); align-items:flex-start;}
+.dom-input .control{flex:1;}
+.dom-err{color:var(--destructive);}
+.dom-field.err .control, .dom-field.err .control:focus-within{
+  border-color:var(--destructive); box-shadow:none;}
+.warnbox{margin:0 0 20px 40px; width:556px; max-width:100%; padding:var(--space-md) var(--space-lg);
+  border-radius:var(--radius-md); background:var(--warning-muted); color:var(--warning-foreground);
+  display:flex; gap:var(--space-sm);}
+.warnbox svg{width:16px; height:16px; flex-shrink:0; margin-top:2px; stroke:var(--warning);}
+.dom-steps{margin:0 0 12px 40px; width:556px; max-width:100%;
+  display:flex; flex-direction:column; gap:var(--space-lg);}
+.dom-step{display:flex; flex-direction:column; gap:var(--space-sm);}
+.dom-step img{display:block; width:100%; height:auto; border-radius:var(--radius-md);
+  border:1px solid var(--border);}
+
+/* ---------- 11 · UGC, 12 · Course ----------
+   Both steps show a 16:9 media block in production with no asset behind it yet —
+   their own code renders it as a deliberate empty placeholder rather than a broken
+   image, and this does the same. It marks where the asset goes. */
+.media{margin:0 0 12px 40px; width:556px; max-width:100%; aspect-ratio:16/9;
+  border-radius:var(--radius-lg); background:var(--muted); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center; color:var(--muted-foreground);}
+
+/* ---------- store preview ---------- */
+.preview{position:relative; margin:0 0 8px 40px; background:var(--card); border:1px solid var(--border);
+  border-radius:var(--radius-lg); box-shadow:var(--shadow-medium); overflow:hidden;}
+.preview-chrome{display:flex; align-items:center; gap:var(--space-xs); height:39px; padding:0 16px;
+  background:var(--card-muted); border-bottom:1px solid var(--border);}
+.preview-chrome .dot{width:8px; height:8px; border-radius:50%; background:var(--border-strong);}
+.preview-url{margin-left:8px; color:var(--muted-foreground);}
+.preview-view{height:440px; overflow-y:auto; overflow-x:hidden; background:var(--card);}
+.preview-view img{display:block; width:100%; height:auto;}
+.preview-caption{margin:0 0 20px 40px; color:var(--muted-foreground); text-align:center;}
+
+.fade-in{animation:fadeUp 240ms ease both;}
+@keyframes fadeUp{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+
+/* Motion is opt-out. Everything that travels, shimmers or draws is switched off;
+   the typing dots and the spinner stay, because there they ARE the message and
+   nothing static says it as well. Both are small and move in place. */
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{
+    animation-duration:1ms !important; animation-iteration-count:1 !important;
+    transition-duration:1ms !important; scroll-behavior:auto !important;}
+  .dots i{animation:blink 1.2s infinite ease-in-out !important;}
+  .spin, .sheet-spin{animation:spin .8s linear infinite !important;}
+}
+
+::-webkit-scrollbar{width:10px;}
+::-webkit-scrollbar-thumb{background:var(--gray-300); border-radius:var(--radius-full); border:2px solid var(--white);}
+
+/* ---------------- progress: the checklist in the corner (Figma `Progress` 254:1318) ---------------- */
+/* below every full-screen moment — the loader (25), the payment modal (30) and the
+   handoff sheet (60). Progress is context, and context steps back when something takes
+   over the screen. */
+.prog-dock{position:fixed; right:24px; bottom:24px; z-index:20; display:flex; justify-content:flex-end;}
+.prog-dock[hidden]{display:none;}
+
+.prog-ring-wrap{position:relative; flex-shrink:0; display:block;}
+.prog-ring-wrap svg{display:block;}
+.prog-ring-track{stroke:var(--muted);}
+.prog-ring-arc{stroke:var(--primary); transition:stroke-dashoffset 520ms cubic-bezier(.22,.61,.36,1);}
+.prog-pct{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--foreground);}
+.prog-copy{display:flex; flex-direction:column; align-items:flex-start; min-width:0;}
+.prog-hint{color:var(--muted-foreground);}
+
+.prog-pill{display:flex; align-items:center; gap:12px; padding:8px 16px 8px 8px; border:0;
+  background:var(--card); border-radius:var(--radius-full); box-shadow:var(--shadow-medium);
+  font-family:inherit; color:var(--foreground); cursor:pointer; text-align:left;
+  transition:transform 160ms ease, box-shadow 160ms ease;}
+.prog-pill:hover{transform:translateY(-1px);}
+.prog-pill:focus-visible{outline:none; box-shadow:var(--shadow-medium), var(--focus-ring);}
+
+.prog-panel{width:360px; background:var(--card); border-radius:var(--radius-xl);
+  box-shadow:var(--shadow-medium); overflow:hidden;}
+.prog-head{display:flex; align-items:flex-start; gap:16px; padding:24px;
+  background:var(--card-muted); border-bottom:1px solid var(--border);}
+.prog-head .prog-copy{flex:1; gap:4px;}
+.prog-head .prog-hint{text-wrap:pretty;}
+.prog-close{width:20px; height:20px; flex-shrink:0; padding:0; border:0; background:none;
+  color:var(--muted-foreground); cursor:pointer;}
+.prog-close svg{width:20px; height:20px; display:block;}
+.prog-steps{padding:12px;}
+
+.pstep{display:flex; align-items:center; gap:12px; height:44px; padding:0 8px;
+  border-radius:var(--radius-md); border:0; width:100%; background:none; font-family:inherit;
+  color:var(--foreground); text-align:left;}
+button.pstep{cursor:pointer;}
+button.pstep:hover{background:var(--muted);}
+button.pstep:focus-visible{outline:none; box-shadow:var(--focus-ring);}
+.pstep-ind{position:relative; width:24px; height:44px; flex:0 0 24px;}
+.pstep-ind i.ln{position:absolute; left:11px; width:2px; background:var(--border);}
+.pstep-ind i.ln.top{top:0; height:11px;}
+.pstep-ind i.ln.bot{top:33px; height:11px;}
+.pstep-cir{position:absolute; top:10px; left:0; width:24px; height:24px; border-radius:50%;
+  box-sizing:border-box; background:var(--card); border:2px solid var(--border);
+  display:flex; align-items:center; justify-content:center;}
+.pstep-cir svg{width:14px; height:14px;}
+.pstep-dot{width:6px; height:6px; border-radius:50%; background:var(--muted-foreground);}
+.pstep-label{flex:1; min-width:0;}
+.pstep-jump{width:20px; height:20px; flex-shrink:0; color:var(--muted-foreground);}
+.pstep-jump svg{width:20px; height:20px; display:block;}
+.pstep.first i.ln.top, .pstep.last i.ln.bot{display:none;}
+.pstep.done .pstep-cir{background:var(--primary); border-color:var(--primary); color:var(--primary-foreground);}
+.pstep.done i.ln{background:var(--primary);}
+.pstep.current{background:var(--card-muted);}
+.pstep.current .pstep-cir{border-color:var(--primary);}
+.pstep.current i.ln.top{background:var(--primary);}
+.pstep.upcoming .pstep-label{color:var(--muted-foreground);}
+
+@media (prefers-reduced-motion: reduce){
+  .prog-ring-arc{transition:none;}
+  .prog-pill:hover{transform:none;}
+}
+
+/* ==========================================================================
+   MOBILE LAYER — 390x844, measured off 428:9472.
+   Nothing here is a new decision: every block is the desktop block reflowed
+   to one column. The wide cards (AutoDS, downsell, store type) are stacked
+   image-over-text as a placeholder until her own mobile design exists.
+   ========================================================================== */
+
+/* ---------- the phone, so this can be looked at on a desktop browser ---------- */
+body{background:var(--gray-100); overflow:auto;}
+/* The phone stays 390x844 and is scaled down to whatever the browser window can show,
+   the way a device preview does — a laptop window is not 844 tall once the tabs and the
+   bookmark bar have taken their cut, and half a screen is not a screen. The scale is set
+   in script because it depends on the window; the device's own pixels never change. */
+.frame{height:100vh; overflow:hidden; display:flex; flex-direction:column;
+  align-items:center; justify-content:flex-start; padding:12px 16px;}
+.device{position:relative; width:390px; height:844px; flex:0 0 auto; overflow:hidden;
+  transform-origin:top center;
+  background:var(--background); border-radius:40px; box-shadow:0 24px 64px rgba(17,24,39,.18);}
+/* the switches leave the column entirely, so they never eat the phone's height */
+.switches{position:fixed; left:16px; top:16px; z-index:5; width:152px;
+  display:flex; flex-direction:column; align-items:flex-start; gap:6px;}
+.switches .ghost-btn{background:var(--card); border-color:var(--border);}
+
+/* fixed layers live inside the phone, not the page */
+.blobs, .modal-back, .handoff, .prog-dock{position:absolute;}
+.app{height:100%;}
+
+/* the ellipses sit where her mobile frame puts them, not where the desktop does */
+.blob--turquoise{left:120px; right:auto; top:-32px;}
+.blob--lime{left:-75px; top:-173px;}
+.blob--lemon{left:-124px; top:557px;}
+
+/* ---------- status bar ---------- */
+.statusbar{flex-shrink:0; height:45px; display:flex; align-items:center; justify-content:space-between;
+  padding:0 24px 0 28px; color:var(--foreground);}
+.sb-time{font-size:15px; font-weight:600; line-height:20px; letter-spacing:.2px;}
+.sb-icons{display:flex; align-items:center; gap:6px;}
+.sb-icons svg{display:block;}
+
+/* ---------- top nav ---------- */
+.nav{height:56px; padding:0 16px; gap:var(--space-sm);}
+.nav-logo svg{height:24px;}
+.account-name, .account-chevron{display:none;}
+
+/* ---------- column ---------- */
+/* 36 + the divider's own 8 lands the first step at y=145, where her frame puts the Chat
+   frame — the 20px progress row she left empty is part of that gap */
+/* the bottom padding is the desktop's 64. It counts into the anchoring maths, so every
+   pixel reserved here pushes a step that much sooner past the fold — the 120 I first
+   reserved for the FAB was costing 56px of every step. With the ring on the left there is
+   nothing left to reserve for. */
+.stage{padding:36px 16px 64px;}
+.chat{max-width:none;}
+.divider{margin:24px 0 16px;}
+.divider:first-child{margin-top:8px;}
+
+/* the avatar is 24 in her frame, so every block hangs at 32 instead of 40 */
+.ai-avatar{width:24px; height:24px;}
+.ai-avatar svg{width:14px; height:14px;}
+.ai-bubble{max-width:none;}
+.user-bubble{max-width:82%;}
+
+.pill-rows, .btn-row, .skeleton, .states-ref, .offer, .cta-row, .trust, .asks, .waiting,
+.banner, .types, .working, .autods, .pro, .howto, .dom-list, .dom-retry, .dom-other,
+.dom-field, .ask-field, .warnbox, .dom-steps, .media, .preview, .preview-caption,
+.card-grid, .choose-row, .indent{margin-left:32px;}
+.dom-retry .dom-list{margin-left:0;}
+
+/* ---------- answers: the ragged right-hand cluster from the frame ---------- */
+.pill-rows{justify-content:flex-end;}
+.pill{max-width:100%;}
+/* Anything the user acts on sits on the user's side. The chat already puts their
+   answers on the right, so the button pairs, the CTA rows and the "I want another name"
+   link go there too instead of hanging off the assistant's indent — one edge, not two.
+   They stack rather than share a 326px row, which would split two labels into three
+   lines each. */
+.btn-row, .cta-row{flex-direction:column; align-items:flex-end; gap:var(--space-sm);}
+.dom-other{text-align:right;}
+.btn{white-space:nowrap; max-width:100%;}
+/* the payment sheet's Buy now fills the sheet — it is the only thing to do there. The
+   guide's button ends a manual you have just scrolled through, so it sits centred at its
+   own width rather than pretending to be a form submit. Her call, on the Figma sheet. */
+.modal .btn{width:100%;}
+.modal--guide .modal-go{display:flex; justify-content:center;}
+.modal--guide .modal-go .btn{width:auto;}
+/* inside a sheet there is no assistant side to be opposite, so the button fills it */
+.modal .btn-row, .modal .cta-row{align-items:stretch;}
+
+/* ---------- blocks that carried a fixed desktop width ---------- */
+.offer{max-width:none;}
+.asks, .disclosure, .howto, .dom-list, .dom-retry, .dom-field, .ask-field,
+.warnbox, .dom-steps, .media{width:auto; max-width:none;}
+.choose-row{width:auto; flex-direction:column; align-items:flex-start; gap:2px;}
+.card-grid{grid-template-columns:repeat(2,1fr); width:auto;}
+.design-card{width:auto; height:100px;}
+.cta-row{margin-top:16px;}
+
+/* ---------- the Shopify offer card ---------- */
+.offer-top{padding:var(--space-lg);}
+/* Title/Mobile */
+.offer-title{font-size:22px; line-height:28px;}
+.price-now{font-size:28px; line-height:36px;}
+.path{padding:var(--space-lg) var(--space-lg) 0;}
+.path-node + .path-node::before{left:calc(-100% + 30px); width:calc(100% - 26px);}
+.path-circle{width:32px; height:32px;}
+.path-circle svg{width:15px; height:15px;}
+.path-node + .path-node::before{top:16px;}
+.path-label{font-size:12px; line-height:16px;}
+.path-foot{padding:var(--space-lg);}
+
+/* ---------- the wide cards, stacked ---------- */
+.autods, .pro{flex-direction:column; align-items:stretch; gap:0; width:auto;}
+.autods-shot, .pro-art{flex:0 0 auto; width:100%; max-width:100%; align-self:stretch;}
+.autods-body, .pro-body{padding:var(--space-lg);}
+.type{padding:var(--space-lg);}
+.type-body{flex-direction:column; gap:var(--space-lg);}
+.type-shot{flex:0 0 auto;}
+/* the ribbon cuts a much bigger corner out of a 326px card than out of an 842px one,
+   so it comes in and the heading keeps clear of it */
+.ribbon{top:22px; right:-54px; width:170px; font-size:11px; line-height:16px;}
+.type-name{padding-right:64px;}
+.pro-head{padding-right:64px;}
+
+/* ---------- preview + live store ---------- */
+.preview-view{height:300px;}
+.live-view{height:180px;}
+.live-products{left:10%; top:52%; transform:scale(.62); transform-origin:left top;}
+.sk--hero{height:120px;}
+.sk--line-lg{width:60%;}
+.sk--line-sm{width:40%;}
+.sk--url{width:110px;}
+.sk--img{height:44px;}
+
+/* ---------- states reference ---------- */
+.state-item{flex-direction:column; gap:var(--space-sm);}
+.state-item .demo{min-width:0;}
+
+/* ---------- modals become sheets off the bottom edge ---------- */
+.modal-back{padding:0; align-items:flex-end;}
+.modal{width:100%; max-height:92%; border-radius:var(--radius-xl) var(--radius-xl) 0 0;
+  padding:var(--space-lg);}
+.modal-title{font-size:20px; line-height:28px;}
+/* the field + Save row is 326px wide here, so the placeholder trails off instead of
+   being cut mid-word. The copy is the desktop copy — this only changes how it clips. */
+.dom-input .control input, .ask-field .control input{text-overflow:ellipsis;}
+.dom-input .btn{padding:0 var(--space-lg);}
+
+/* the line item stacks: picture on top, then what it is, then what it costs. Side by side
+   at 326px the 88px thumbnail squeezed the description into six lines against a price
+   column it never needed to share a row with. */
+.modal-item{flex-direction:column; align-items:stretch; gap:var(--space-md);
+  padding:var(--space-md);}
+.modal-item img{width:100%;}
+.modal-price{text-align:left; display:flex; align-items:baseline; gap:var(--space-sm);
+  padding-top:var(--space-md); border-top:1px solid var(--border);}
+.modal-price b{display:inline;}
+.modal--guide .modal-head{top:calc(var(--space-lg) * -1);
+  margin:calc(var(--space-lg) * -1) calc(var(--space-lg) * -1) var(--space-lg);
+  padding:var(--space-lg) var(--space-lg) var(--space-md);}
+.modal--guide .modal-go{bottom:calc(var(--space-lg) * -1);
+  margin:var(--space-lg) calc(var(--space-lg) * -1) calc(var(--space-lg) * -1);
+  padding:var(--space-md) var(--space-lg) var(--space-lg);}
+.sheet{width:300px;}
+
+/* ---------- progress: the ring alone ----------
+   Her frame draws it bottom-right, but every control the user presses is on the right now,
+   so it hands the corner over and takes the left — the assistant's side, which is empty
+   below the last bubble. That also retires the 80px clearance compromise: nothing lands
+   under it any more, so the stage keeps the desktop's 64.
+   It keeps the desktop's stacking — below the payment sheet (30) and the handoff (60).
+   I had raised it above them and moved it aside while a sheet was up; her call is that it
+   should not move at all, it is simply not on this screen. A sheet comes off the bottom
+   edge full width, so the ring is behind it and gone, without a rule of its own. */
+.prog-dock{left:16px; right:auto; bottom:32px; justify-content:flex-start;}
+.prog-pill{width:64px; height:64px; padding:0; border-radius:var(--radius-full); justify-content:center;}
+.prog-pill .prog-copy{display:none;}
+/* opened, the checklist has nowhere to go but the bottom of the screen */
+.prog-dock:has(.prog-panel){left:0; right:0; bottom:0; top:auto;}
+.prog-panel{width:100%; border-radius:var(--radius-xl) var(--radius-xl) 0 0;}
+.prog-head{padding:var(--space-lg);}
+.prog-steps{padding:var(--space-sm) var(--space-sm) var(--space-lg);}
+
+::-webkit-scrollbar{width:0; height:0;}
+
+/* on a real phone the frame is the screen */
+@media (max-width:440px){
+  .frame{padding:0; height:100dvh;}
+  .device{width:100%; height:100dvh; border-radius:0; box-shadow:none;}
+  .switches{padding:12px; background:var(--card); border-top:1px solid var(--border); width:100%;}
+}
+
+</style>
+
+<div class="frame">
+<div class="device" id="device">
+
+  <div class="blobs">
+    <div class="blob blob--turquoise"></div>
+    <div class="blob blob--lime"></div>
+    <div class="blob blob--lemon"></div>
+  </div>
+
+  <div class="app">
+    <div class="statusbar">
+      <span class="sb-time">10:30</span>
+      <span class="sb-icons"><svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg width="17" height="12" viewBox="0 0 17 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M1 3.6a11 11 0 0 1 15 0"/><path d="M3.7 6.5a7.2 7.2 0 0 1 9.6 0"/><path d="M6.4 9.3a3.3 3.3 0 0 1 4.2 0"/><circle cx="8.5" cy="11.2" r=".8" fill="currentColor" stroke="none"/></svg><svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3" stroke="currentColor" stroke-opacity=".35"/><rect x="2" y="2" width="18" height="8" rx="1.8" fill="currentColor"/><path d="M23 4v4a2 2 0 0 0 0-4z" fill="currentColor" fill-opacity=".35"/></svg></span>
+    </div>
+    <header class="nav">
+      <div class="nav-logo" id="navLogo"></div>
+      <div class="nav-spacer"></div>
+      <div class="account">
+        <span class="account-avatar" id="accountAvatar"></span>
+        <span class="account-name t-body-small">My account</span>
+        <span class="account-chevron" id="accountChevron"></span>
+      </div>
+    </header>
+    <main class="stage" id="stage">
+      <div class="chat" id="chat"></div>
+    </main>
+  </div>
+
+</div>
+
+<!-- the prototype switches sit outside the phone so the screen stays the screen -->
+<div class="switches">
+  <button class="ghost-btn" id="statesBtn" title="Show the assistant waiting states">States</button>
+  <button class="ghost-btn" id="publishBtn" title="Prototype switch: make the publish attempt fail. Turn it off to let the retry go through.">Publish: works</button>
+  <button class="ghost-btn" id="buildBtn" title="Prototype switch: make the store build fail. Turn it off to let Try again go through.">Build: works</button>
+  <button class="ghost-btn" id="offerBtn" title="Prototype switch: run the downsell countdown at 10 seconds instead of 10 minutes, so the expired state can be reviewed.">Offer: 10 min</button>
+  <button class="ghost-btn" id="domainBtn" title="Prototype switch: make the first suggested domain turn out to be taken, so the failed-check state can be reviewed.">Domain: free</button>
+  <button class="ghost-btn" id="restartBtn">Restart</button>
+</div>
+</div>
+
+<script>
+(function(){
+  const $ = (id) => document.getElementById(id);
+  const el = (html) => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; };
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+  const chat = $('chat'), stage = $('stage');
+  /* every fixed layer is absolute inside the phone, so it must hang off the device */
+  const shell = document.getElementById('device') || document.body;
+
+  /* ---------------- fitting the phone into the browser window ----------------
+     The device keeps its 390x844; only the picture of it shrinks. Under 440px wide there
+     is no picture — the phone IS the window — so nothing is scaled there. */
+  const fitPhone = () => {
+    if (window.innerWidth <= 440) { shell.style.transform = ''; return; }
+    const s = Math.min(1, (window.innerHeight - 24) / 844);
+    shell.style.transform = s < 1 ? 'scale(' + s.toFixed(4) + ')' : '';
+  };
+  window.addEventListener('resize', fitPhone);
+  fitPhone();
+  /* A distance read off getBoundingClientRect comes back in the window's pixels, but
+     everything the scroll maths compares it against — clientHeight, scrollTop — is in the
+     phone's own. So every such distance is divided back. */
+  const unscale = () => (shell.getBoundingClientRect().width / 390) || 1;
+
+  /* ---------------- icons: Lucide, same set as the Figma components ---------------- */
+  const IC = (p, sw) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw || 1.75}" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+  const ICON = {
+    paw: IC('<circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"/>'),
+    sofa: IC('<path d="M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3"/><path d="M2 16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v1.5a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5V11a2 2 0 0 0-4 0z"/><path d="M4 18v2"/><path d="M20 18v2"/><path d="M12 4v9"/>'),
+    dumbbell: IC('<path d="M17.596 12.768a2 2 0 1 0 2.829-2.829l-1.768-1.767a2 2 0 0 0 2.828-2.829l-2.828-2.828a2 2 0 0 0-2.829 2.828l-1.767-1.768a2 2 0 1 0-2.829 2.829z"/><path d="m2.5 21.5 1.4-1.4"/><path d="m20.1 3.9 1.4-1.4"/><path d="M5.343 21.485a2 2 0 1 0 2.829-2.828l1.767 1.768a2 2 0 1 0 2.829-2.829l-6.364-6.364a2 2 0 1 0-2.829 2.829l1.768 1.767a2 2 0 0 0-2.828 2.829z"/><path d="m9.6 14.4 4.8-4.8"/>'),
+    shirt: IC('<path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>'),
+    penLine2: IC('<path d="M13 21h8"/><path d="m15 5 4 4"/><path d="M20.707 3.293a1 1 0 0 1 0 1.414l-13 13A2 2 0 0 1 6.586 18H4a1 1 0 0 1-1-1v-2.586a2 2 0 0 1 .586-1.414l13-13a1 1 0 0 1 1.414 0z"/>'),
+    funnel: IC('<path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z"/>'),
+    clock: IC('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'),
+    sparkles: IC('<path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/>'),
+    smartphone: IC('<rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/>'),
+    wand: IC('<path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/>'),
+    arrowRight: IC('<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>', 2),
+    brain: IC('<path d="M12 18V5"/><path d="M15 13a4.17 4.17 0 0 1-3-4 4.17 4.17 0 0 1-3 4"/><path d="M17.598 6.5A3 3 0 1 0 12 5a3 3 0 1 0-5.598 1.5"/><path d="M17.997 5.125a4 4 0 0 1 2.526 5.77"/><path d="M18 18a4 4 0 0 0 2-7.464"/><path d="M19.967 17.483A4 4 0 1 1 12 18a4 4 0 1 1-7.967-.517"/><path d="M6 18a4 4 0 0 1-2-7.464"/><path d="M6.003 5.125a4 4 0 0 0-2.526 5.77"/>', 2),
+    user: IC('<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>', 2),
+    chevronDown: IC('<path d="m6 9 6 6 6-6"/>', 2),
+    chevronRight: IC('<path d="m9 18 6-6-6-6"/>', 2),
+    check: IC('<path d="M20 6 9 17l-5-5"/>', 2.5),
+    squareArrowOutUpRight: IC('<path d="M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6"/><path d="m21 3-9 9"/><path d="M15 3h6v6"/>', 2),
+    creditCard: IC('<rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/>', 2),
+    bag: IC('<path d="M16 10a4 4 0 0 1-8 0"/><path d="M3.103 6.034h17.794"/><path d="M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z"/>', 2),
+    click: IC('<path d="M14 4.1 12 6"/><path d="m5.1 8-2.9-.8"/><path d="m6 12-1.9 2"/><path d="M7.2 2.2 8 5.1"/><path d="M9.037 9.69a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z"/>', 2),
+    layoutGrid: IC('<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>', 2),
+    galleryThumbnails: IC('<rect width="18" height="14" x="3" y="3" rx="2"/><path d="M4 21h1"/><path d="M9 21h1"/><path d="M14 21h1"/><path d="M19 21h1"/>', 2),
+    close: IC('<path d="M18 6 6 18"/><path d="m6 6 12 12"/>', 2),
+    info: IC('<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>', 2),
+    gift: IC('<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/>', 2),
+    circlePause: IC('<circle cx="12" cy="12" r="10"/><line x1="10" x2="10" y1="15" y2="9"/><line x1="14" x2="14" y1="15" y2="9"/>', 2),
+    alert: IC('<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>', 2),
+    users: IC('<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>', 2),
+    ellipsis: IC('<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>', 2),
+    graduationCap: IC('<path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/>', 2),
+    circleCheck: IC('<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>', 2),
+    circleX: IC('<circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/>', 2),
+    rotate: IC('<path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1.06 6.7 2.82L21 8"/><path d="M21 3v5h-5"/>', 2),
+    bulb: IC('<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>', 2),
+    shield: IC('<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>', 2),
+
+    /* the AutoDS card's four marks. Lucide, like everything else — the design file
+       draws them in AutoDS's own set, but the set is not ours to carry. */
+    package: IC('<path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/>'),
+    truck: IC('<path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/>'),
+    refreshCw: IC('<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>'),
+    mapPinHouse: IC('<path d="M15 22a1 1 0 0 1-1-1v-4a1 1 0 0 1 .445-.832l3-2a1 1 0 0 1 1.11 0l3 2A1 1 0 0 1 22 17v4a1 1 0 0 1-1 1z"/><path d="M18 10a8 8 0 0 0-16 0c0 4.993 5.539 10.193 7.399 11.799a1 1 0 0 0 .601.2"/><path d="M18 22v-3"/><circle cx="10" cy="10" r="3"/>')
+  };
+  const BYS_MARK = '<svg viewBox="0 0 28 27" xmlns="http://www.w3.org/2000/svg"><path d="M21.8158 5.5332C23.8708 5.5332 25.5956 7.08195 25.8168 9.125L27.2308 22.2051C27.488 24.585 25.6236 26.6621 23.2299 26.6621H4.02477C1.63106 26.662 -0.233375 24.5849 0.0237967 22.2051L1.43786 9.125C1.65897 7.08195 3.3838 5.53322 5.43884 5.5332H21.8158ZM20.6703 10.3125C19.9757 10.3125 19.4125 10.8757 19.4125 11.5703C19.4124 14.7653 16.8223 17.3555 13.6273 17.3555C10.4324 17.3554 7.84225 14.7652 7.84216 11.5703C7.84216 10.8757 7.27892 10.3125 6.58434 10.3125C5.88994 10.3127 5.32751 10.8759 5.32751 11.5703C5.3276 16.1544 9.04327 19.87 13.6273 19.8701C18.2114 19.8701 21.928 16.1544 21.9281 11.5703C21.9281 10.8758 21.3648 10.3125 20.6703 10.3125ZM9.09997 0C10.2113 2.36362e-05 11.1117 0.901393 11.1117 2.0127C11.1114 3.12378 10.2111 4.02439 9.09997 4.02441C7.98881 4.02441 7.08753 3.12379 7.08727 2.0127C7.08727 0.901379 7.98865 0 9.09997 0ZM18.1547 0C19.266 0 20.1674 0.901379 20.1674 2.0127C20.1671 3.12379 19.2658 4.02441 18.1547 4.02441C17.0436 4.02428 16.1432 3.12371 16.1429 2.0127C16.1429 0.90146 17.0434 0.000132068 18.1547 0Z" fill="#009A7B"/></svg>';
+  const BYS_LOGO = '<svg viewBox="0 0 216 27" xmlns="http://www.w3.org/2000/svg"><path d="M21.8158 5.5332C23.8708 5.5332 25.5956 7.08195 25.8168 9.125L27.2308 22.2051C27.488 24.585 25.6236 26.6621 23.2299 26.6621H4.02477C1.63106 26.662 -0.233375 24.5849 0.0237967 22.2051L1.43786 9.125C1.65897 7.08195 3.3838 5.53322 5.43884 5.5332H21.8158ZM20.6703 10.3125C19.9757 10.3125 19.4125 10.8757 19.4125 11.5703C19.4124 14.7653 16.8223 17.3555 13.6273 17.3555C10.4324 17.3554 7.84225 14.7652 7.84216 11.5703C7.84216 10.8757 7.27892 10.3125 6.58434 10.3125C5.88994 10.3127 5.32751 10.8759 5.32751 11.5703C5.3276 16.1544 9.04327 19.87 13.6273 19.8701C18.2114 19.8701 21.928 16.1544 21.9281 11.5703C21.9281 10.8758 21.3648 10.3125 20.6703 10.3125ZM9.09997 0C10.2113 2.36362e-05 11.1117 0.901393 11.1117 2.0127C11.1114 3.12378 10.2111 4.02439 9.09997 4.02441C7.98881 4.02441 7.08753 3.12379 7.08727 2.0127C7.08727 0.901379 7.98865 0 9.09997 0ZM18.1547 0C19.266 0 20.1674 0.901379 20.1674 2.0127C20.1671 3.12379 19.2658 4.02441 18.1547 4.02441C17.0436 4.02428 16.1432 3.12371 16.1429 2.0127C16.1429 0.90146 17.0434 0.000132068 18.1547 0Z" fill="#009A7B"/><path d="M210.869 11.6105V13.9245H215.396V16.9227H210.869V19.4782H216V22.6374H206.925V8.45129H216V11.6105H210.869Z" fill="#111827"/><path d="M200.805 22.6374L197.988 17.4057H197.565V22.6374H193.622V8.45129H199.839C200.98 8.45129 201.945 8.65252 202.737 9.05496C203.528 9.44399 204.125 9.98729 204.528 10.6849C204.93 11.369 205.131 12.1404 205.131 12.9989C205.131 13.9648 204.863 14.8166 204.327 15.5544C203.803 16.2788 203.032 16.7953 202.012 17.1038L205.212 22.6374H200.805ZM197.565 14.7093H199.517C200.054 14.7093 200.456 14.5818 200.725 14.327C200.993 14.0721 201.127 13.7032 201.127 13.2202C201.127 12.7641 200.986 12.4087 200.705 12.1538C200.436 11.8855 200.041 11.7513 199.517 11.7513H197.565V14.7093Z" fill="#111827"/><path d="M184.585 22.7783C183.256 22.7783 182.036 22.4697 180.922 21.8527C179.809 21.2222 178.923 20.3569 178.266 19.2569C177.622 18.1435 177.3 16.8892 177.3 15.4941C177.3 14.0989 177.622 12.8513 178.266 11.7513C178.923 10.6379 179.809 9.77265 180.922 9.15557C182.036 8.53849 183.256 8.22995 184.585 8.22995C185.926 8.22995 187.147 8.53849 188.247 9.15557C189.36 9.77265 190.239 10.6379 190.883 11.7513C191.527 12.8513 191.849 14.0989 191.849 15.4941C191.849 16.8892 191.527 18.1435 190.883 19.2569C190.239 20.3569 189.36 21.2222 188.247 21.8527C187.133 22.4697 185.913 22.7783 184.585 22.7783ZM184.585 19.116C185.591 19.116 186.382 18.7874 186.959 18.1301C187.549 17.4727 187.844 16.5941 187.844 15.4941C187.844 14.3672 187.549 13.4818 186.959 12.8379C186.382 12.1806 185.591 11.8519 184.585 11.8519C183.565 11.8519 182.767 12.1806 182.19 12.8379C181.613 13.4818 181.325 14.3672 181.325 15.4941C181.325 16.6075 181.613 17.4929 182.19 18.1502C182.767 18.7941 183.565 19.116 184.585 19.116Z" fill="#111827"/><path d="M176.324 8.45129V11.5904H172.541V22.6374H168.597V11.5904H164.854V8.45129H176.324Z" fill="#111827"/><path d="M158.514 22.7783C156.864 22.7783 155.509 22.3892 154.449 21.6112C153.389 20.8197 152.819 19.6929 152.738 18.2307H156.944C156.984 18.727 157.132 19.0892 157.387 19.3173C157.642 19.5453 157.97 19.6593 158.373 19.6593C158.735 19.6593 159.03 19.5721 159.258 19.3978C159.5 19.2099 159.62 18.9551 159.62 18.6331C159.62 18.2173 159.426 17.8953 159.037 17.6672C158.648 17.4392 158.017 17.1843 157.145 16.9026C156.22 16.5941 155.468 16.2989 154.892 16.0172C154.328 15.7221 153.832 15.2995 153.402 14.7495C152.987 14.1861 152.779 13.455 152.779 12.5562C152.779 11.644 153.007 10.866 153.463 10.222C153.919 9.56472 154.549 9.06837 155.354 8.733C156.159 8.39763 157.071 8.22995 158.091 8.22995C159.741 8.22995 161.056 8.61898 162.035 9.39704C163.028 10.1617 163.557 11.2416 163.625 12.6367H159.339C159.325 12.2074 159.191 11.8855 158.936 11.6708C158.695 11.4562 158.379 11.3489 157.99 11.3489C157.695 11.3489 157.454 11.4361 157.266 11.6105C157.078 11.7849 156.984 12.033 156.984 12.355C156.984 12.6233 157.085 12.858 157.286 13.0593C157.501 13.2471 157.762 13.4148 158.071 13.5623C158.379 13.6965 158.835 13.8709 159.439 14.0855C160.338 14.394 161.076 14.7026 161.653 15.0111C162.243 15.3062 162.746 15.7288 163.162 16.2788C163.591 16.8154 163.806 17.4996 163.806 18.3313C163.806 19.1764 163.591 19.9343 163.162 20.6051C162.746 21.2758 162.136 21.8057 161.331 22.1947C160.539 22.5838 159.6 22.7783 158.514 22.7783Z" fill="#111827"/><path d="M147.041 22.6374L144.224 17.4057H143.802V22.6374H139.858V8.45129H146.075C147.216 8.45129 148.181 8.65252 148.973 9.05496C149.764 9.44399 150.361 9.98729 150.764 10.6849C151.166 11.369 151.367 12.1404 151.367 12.9989C151.367 13.9648 151.099 14.8166 150.563 15.5544C150.039 16.2788 149.268 16.7953 148.249 17.1038L151.448 22.6374H147.041ZM143.802 14.7093H145.753C146.29 14.7093 146.692 14.5818 146.961 14.327C147.229 14.0721 147.363 13.7032 147.363 13.2202C147.363 12.7641 147.222 12.4087 146.941 12.1538C146.672 11.8855 146.277 11.7513 145.753 11.7513H143.802V14.7093Z" fill="#009A7B"/><path d="M129.396 8.45129V16.6813C129.396 17.4459 129.57 18.0362 129.919 18.452C130.281 18.8679 130.824 19.0758 131.549 19.0758C132.273 19.0758 132.817 18.8679 133.179 18.452C133.554 18.0227 133.742 17.4325 133.742 16.6813V8.45129H137.686V16.6813C137.686 17.9825 137.411 19.0959 136.861 20.0215C136.311 20.9337 135.56 21.6246 134.607 22.0941C133.668 22.5502 132.622 22.7783 131.468 22.7783C130.315 22.7783 129.282 22.5502 128.37 22.0941C127.471 21.6246 126.76 20.9337 126.237 20.0215C125.727 19.1093 125.472 17.9959 125.472 16.6813V8.45129H129.396Z" fill="#009A7B"/><path d="M116.495 22.7783C115.167 22.7783 113.946 22.4697 112.833 21.8527C111.72 21.2222 110.834 20.3569 110.177 19.2569C109.533 18.1435 109.211 16.8892 109.211 15.4941C109.211 14.0989 109.533 12.8513 110.177 11.7513C110.834 10.6379 111.72 9.77265 112.833 9.15557C113.946 8.53849 115.167 8.22995 116.495 8.22995C117.837 8.22995 119.058 8.53849 120.158 9.15557C121.271 9.77265 122.15 10.6379 122.794 11.7513C123.437 12.8513 123.759 14.0989 123.759 15.4941C123.759 16.8892 123.437 18.1435 122.794 19.2569C122.15 20.3569 121.271 21.2222 120.158 21.8527C119.044 22.4697 117.823 22.7783 116.495 22.7783ZM116.495 19.116C117.501 19.116 118.293 18.7874 118.87 18.1301C119.46 17.4727 119.755 16.5941 119.755 15.4941C119.755 14.3672 119.46 13.4818 118.87 12.8379C118.293 12.1806 117.501 11.8519 116.495 11.8519C115.476 11.8519 114.678 12.1806 114.101 12.8379C113.524 13.4818 113.235 14.3672 113.235 15.4941C113.235 16.6075 113.524 17.4929 114.101 18.1502C114.678 18.7941 115.476 19.116 116.495 19.116Z" fill="#009A7B"/><path d="M108.483 8.45129L103.493 18.1301V22.6374H99.5288V18.1301L94.5385 8.45129H99.0459L101.541 13.9245L104.036 8.45129H108.483Z" fill="#009A7B"/><path d="M86.4021 8.45129C87.8912 8.45129 89.1924 8.75313 90.3058 9.35679C91.4327 9.94704 92.2979 10.7788 92.9016 11.8519C93.5052 12.9251 93.8071 14.1526 93.8071 15.5343C93.8071 16.9026 93.4985 18.1233 92.8814 19.1965C92.2778 20.2697 91.4125 21.1148 90.2857 21.7319C89.1723 22.3356 87.8777 22.6374 86.4021 22.6374H80.788V8.45129H86.4021ZM86.1003 19.1563C87.254 19.1563 88.1594 18.841 88.8168 18.2105C89.4741 17.5801 89.8028 16.688 89.8028 15.5343C89.8028 14.3672 89.4741 13.4684 88.8168 12.8379C88.1594 12.194 87.254 11.8721 86.1003 11.8721H84.732V19.1563H86.1003Z" fill="#111827"/><path d="M74.8478 19.6191H79.2545V22.6374H70.9038V8.45129H74.8478V19.6191Z" fill="#111827"/><path d="M68.6578 8.45129V22.6374H64.7139V8.45129H68.6578Z" fill="#111827"/><path d="M54.2521 8.45129V16.6813C54.2521 17.4459 54.4265 18.0362 54.7753 18.452C55.1375 18.8679 55.6808 19.0758 56.4051 19.0758C57.1295 19.0758 57.6728 18.8679 58.035 18.452C58.4107 18.0227 58.5985 17.4325 58.5985 16.6813V8.45129H62.5424V16.6813C62.5424 17.9825 62.2674 19.0959 61.7174 20.0215C61.1674 20.9337 60.4162 21.6246 59.4637 22.0941C58.5247 22.5502 57.4783 22.7783 56.3247 22.7783C55.171 22.7783 54.1381 22.5502 53.2258 22.0941C52.3271 21.6246 51.6161 20.9337 51.0929 20.0215C50.5831 19.1093 50.3283 17.9959 50.3283 16.6813V8.45129H54.2521Z" fill="#111827"/><path d="M45.9437 15.3532C46.7754 15.541 47.4327 15.9569 47.9156 16.6008C48.412 17.2313 48.6602 17.9557 48.6602 18.774C48.6602 19.9813 48.2443 20.927 47.4126 21.6112C46.5809 22.2953 45.4138 22.6374 43.9113 22.6374H36.8887V8.45129H43.69C45.1388 8.45129 46.2723 8.77325 47.0906 9.41716C47.9223 10.0611 48.3382 10.9666 48.3382 12.1337C48.3382 12.9654 48.1169 13.6629 47.6742 14.2264C47.2449 14.7764 46.6681 15.152 45.9437 15.3532ZM40.8326 14.0855H42.8247C43.8174 14.0855 44.3138 13.6764 44.3138 12.858C44.3138 12.0129 43.8174 11.5904 42.8247 11.5904H40.8326V14.0855ZM43.1266 19.4581C44.1193 19.4581 44.6156 19.0423 44.6156 18.2105C44.6156 17.7813 44.4815 17.4526 44.2132 17.2246C43.9583 16.9965 43.5894 16.8825 43.1064 16.8825H40.8326V19.4581H43.1266Z" fill="#111827"/></svg>';
+
+  $('navLogo').innerHTML = BYS_LOGO;
+  $('accountAvatar').innerHTML = ICON.user;
+  $('accountChevron').innerHTML = ICON.chevronDown;
+
+  /* ---------------- data ---------------- */
+  const AI_PICK = 'Pet products';
+  const NICHES = [
+    { name: 'Pet products',        icon: ICON.paw },
+    { name: 'Home &amp; living',   icon: ICON.sofa },
+    { name: 'Fitness &amp; sport', icon: ICON.dumbbell },
+    { name: 'Fashion &amp; apparel', icon: ICON.shirt },
+    { name: 'Beauty &amp; skincare', icon: ICON.sparkles },
+    { name: 'Tech &amp; gadgets',  icon: ICON.smartphone },
+    { name: 'Let&rsquo;s AI decide', icon: ICON.wand }
+  ];
+  const DESIGNS = [1, 2, 3, 4, 5, 6].map(n => ({ name: 'Design ' + n, img: 'images/design-' + n + '.png' }));
+
+  const state = { niche: '', aiPicked: false, designs: [], storeType: '', domain: '' };
+
+  /* ---------------- chat primitives ---------------- */
+  const add = (node) => { chat.appendChild(node); scrollBottom(); return node; };
+
+  /* The view follows the assistant, not the bottom of the page. Pinning to the bottom on
+     every append meant a tall block — a pair of cards and their buttons — pushed the line
+     that introduced it off the top before it could be read. So: scroll as far as the
+     bottom, but never past the point where the newest assistant turn sits at the top of
+     the stage. Short turns behave exactly as before; tall ones stop and let you read down. */
+  /* A step opens at the top of the screen; inside it the conversation runs downward. The
+     unit is the step, not the line — "Did you activate the plan?" belongs to the step that
+     offered the plan and should not jump over it.
+     Opening at the top needs somewhere to scroll to, so an empty tail grows under the
+     transcript — but only as far as a step shorter than the screen needs. Once a step is
+     taller than the screen the tail is nothing and the view follows the bottom, so whatever
+     just arrived stays visible. Measured against the stage rather than offsetTop: the offset
+     parent is the shell, so offsetTop carries the nav height and lands the line under it. */
+  let anchor = null;
+  const ANCHOR_PAD = 40;
+  const tail = el('<div aria-hidden="true"></div>');
+
+  const scrollBottom = () => {
+    chat.appendChild(tail);                 /* whatever was just added, the tail stays last */
+    tail.style.height = '0px';
+    if (!anchor || !anchor.isConnected) {
+      stage.scrollTop = Math.max(0, stage.scrollHeight - stage.clientHeight);
+      return;
+    }
+    const anchorTop = stage.scrollTop
+      + (anchor.getBoundingClientRect().top - stage.getBoundingClientRect().top) / unscale();
+    const below = stage.scrollHeight - anchorTop;
+    tail.style.height = Math.max(0, stage.clientHeight - ANCHOR_PAD - below) + 'px';
+    /* and then simply to the bottom. The tail already encodes the rule: on a short step it is
+       sized so that the bottom IS the step sitting 40px down, and on a step taller than the
+       screen it is nothing, so the bottom is whatever just arrived. Choosing between the two
+       with a min() was the bug — on a tall step it picked the step's start and left new
+       content under the fold. */
+    stage.scrollTop = Math.max(0, stage.scrollHeight - stage.clientHeight);
+  };
+
+  /* A block that is not a step, but should still open at the top of the screen. Dropping
+     the anchor lets the next assistant turn claim it, exactly as the first line of a step
+     does. The source question is the case: it belongs to no step, so without this it
+     arrives underneath whichever step is still filling the view. */
+  const startsFresh = () => { anchor = null; };
+
+  /* ---------------- the keyboard's half of the screen ----------------
+     The transcript leaves a field wherever it arrived, which is usually the bottom edge —
+     and on a phone the bottom edge is exactly where the keyboard appears the moment the
+     field is focused. So focusing a field lifts its whole block clear of that band, error
+     line included, and the tail grows if there is not enough transcript to scroll against.
+
+     The prototype runs in a desktop browser where nothing slides up, so the band is
+     assumed: 336 is iOS's keyboard on a 390x844 screen. On a real phone visualViewport
+     reports the real one and that is used instead — the same code, a measured number. */
+  const KEYBOARD = 336;
+  const FIELD_BLOCK = '.dom-retry, .dom-field, .ask-field, .dom-input, .control';
+  const keyboardBand = () => {
+    const vv = window.visualViewport;
+    const hidden = vv ? window.innerHeight - vv.height : 0;
+    return hidden > 80 ? hidden : KEYBOARD;
+  };
+
+  function liftField(node) {
+    if (!node || !node.isConnected) return;
+    const clear = stage.clientHeight - keyboardBand() - 16;   /* the field's bottom goes here */
+    const below = (node.getBoundingClientRect().bottom - stage.getBoundingClientRect().top) / unscale();
+    const delta = below - clear;
+    if (delta <= 1) return;
+    const want = stage.scrollTop + delta;
+    /* a field at the end of the transcript has nothing underneath it to scroll against,
+       so the same tail the anchoring uses is grown to make the room */
+    const max = stage.scrollHeight - stage.clientHeight;
+    if (want > max) tail.style.height = ((parseFloat(tail.style.height) || 0) + (want - max)) + 'px';
+    stage.scrollTo({ top: want, behavior: REDUCED ? 'auto' : 'smooth' });
+  }
+
+  const focusedField = () => {
+    const a = document.activeElement;
+    if (!a || !stage.contains(a) || !a.matches('input, textarea, select')) return null;
+    return a.closest(FIELD_BLOCK) || a;
+  };
+
+  stage.addEventListener('focusin', (e) => {
+    if (!e.target.matches('input, textarea, select')) return;
+    /* after the browser has done its own scrolling into view */
+    requestAnimationFrame(() => liftField(e.target.closest(FIELD_BLOCK) || e.target));
+  });
+  /* on a real phone the keyboard arrives after the focus event, as a viewport resize */
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => liftField(focusedField()));
+  }
+
+  function divider(text) {
+    const d = el(`<div class="divider"><span class="t-label-section">${text}</span><i></i></div>`);
+    said = 0;                 /* a step counts its own lines, not the one before it */
+    anchor = d;
+    const node = add(d);
+    const n = parseInt(text, 10);
+    if (n) progress.enter(n, node);
+    return node;
+  }
+
+  /* ---------------- progress: the corner checklist (Figma `Progress` 254:1318) ----------------
+     The steps are exactly the nine numbered dividers. The preview, the build loader and
+     "How you found us" carry no number, so they are not steps — CONTEXT.md, 2026-09-10.
+     The chevron on a finished step scrolls the transcript back to it. It does not rewind the
+     flow: nothing is undone, you are just taken to where it happened. Whether a step should be
+     genuinely re-openable is still a question for the manager. */
+  const PROGRESS_STEPS = [
+    'Choose your niche',
+    'Pick your homepage design',
+    'Activate your Shopify plan',
+    'Choose your store type',
+    'Add top-selling products',
+    'Take your store live',
+    'Secure your domain',
+    'Claim your UGC offer',
+    'Start your course'
+  ];
+
+  const progress = (() => {
+    const TOTAL = PROGRESS_STEPS.length;
+    const nodes = {};
+    let current = 0, done = 0, open = false, shown = 0;
+    const dock = el(`<div class="prog-dock" hidden></div>`);
+    shell.appendChild(dock);
+
+    const pct = () => done / TOTAL;
+
+    function ring(size, r, sw, value, cls) {
+      const c = 2 * Math.PI * r, mid = size / 2;
+      return `<span class="prog-ring-wrap" style="width:${size}px;height:${size}px">
+          <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-hidden="true">
+            <circle class="prog-ring-track" cx="${mid}" cy="${mid}" r="${r}" fill="none" stroke-width="${sw}"/>
+            <circle class="prog-ring-arc" cx="${mid}" cy="${mid}" r="${r}" fill="none" stroke-width="${sw}"
+              stroke-dasharray="${c.toFixed(2)}" stroke-dashoffset="${(c * (1 - value)).toFixed(2)}"
+              transform="rotate(-90 ${mid} ${mid})"/>
+          </svg>
+          <span class="prog-pct ${cls}">${Math.round(pct() * 100)}%</span>
+        </span>`;
+    }
+
+    function rows() {
+      return PROGRESS_STEPS.map((label, i) => {
+        const n = i + 1;
+        const st = n <= done ? 'done' : (n === current ? 'current' : 'upcoming');
+        const edge = (i === 0 ? ' first' : '') + (i === PROGRESS_STEPS.length - 1 ? ' last' : '');
+        const inner = st === 'done' ? ICON.check : (st === 'upcoming' ? '<i class="pstep-dot"></i>' : '');
+        const canJump = !!nodes[n];
+        const tag = canJump ? 'button' : 'div';
+        const attrs = canJump ? ` type="button" data-step="${n}"` : '';
+        return `<${tag} class="pstep ${st}${edge}"${attrs}>
+            <span class="pstep-ind"><i class="ln top"></i><i class="ln bot"></i>
+              <span class="pstep-cir">${inner}</span></span>
+            <span class="pstep-label t-body-default${st === 'current' ? '-emph' : ''}">${label}</span>
+            ${canJump ? `<span class="pstep-jump">${ICON.chevronRight}</span>` : ''}
+          </${tag}>`;
+      }).join('');
+    }
+
+    function render() {
+      const all = done === TOTAL;
+      dock.innerHTML = open
+        ? `<div class="prog-panel fade-in">
+             <div class="prog-head">
+               ${ring(68, 31.4, 5.1, shown, 't-body-default-emph')}
+               <span class="prog-copy">
+                 <span class="t-body-default-emph">${all ? 'That&rsquo;s the lot.' : 'Keep it up!'}</span>
+                 <span class="t-body-small prog-hint">${all
+                    ? `All ${TOTAL} steps done.`
+                    : `${done} of ${TOTAL} steps done &mdash; here&rsquo;s what&rsquo;s left.`}</span>
+               </span>
+               <button class="prog-close" type="button" aria-label="Close the checklist">${ICON.close}</button>
+             </div>
+             <div class="prog-steps">${rows()}</div>
+           </div>`
+        : `<button class="prog-pill" type="button" aria-label="Open your checklist">
+             ${ring(56, 25.5, 5.05, shown, 't-label-assistant')}
+             <span class="prog-copy">
+               <span class="t-body-default-emph">${all ? `All ${TOTAL} steps done` : `Step ${current} of ${TOTAL}`}</span>
+               <span class="t-body-small prog-hint">See your checklist</span>
+             </span>
+           </button>`;
+
+      if (shown !== pct()) {
+        const target = pct();
+        const paint = () => {
+          dock.querySelectorAll('.prog-ring-arc').forEach(arc => {
+            const c = parseFloat(arc.getAttribute('stroke-dasharray'));
+            arc.style.strokeDashoffset = (c * (1 - target)).toFixed(2);
+          });
+          shown = target;
+        };
+        REDUCED ? paint() : requestAnimationFrame(() => requestAnimationFrame(paint));
+      }
+    }
+
+    dock.addEventListener('click', (e) => {
+      e.stopPropagation();   /* render() replaces the clicked node, so the document
+                                listener below would read it as a click outside */
+      if (e.target.closest('.prog-pill')) { open = true; render(); return; }
+      if (e.target.closest('.prog-close')) { open = false; render(); return; }
+      const step = e.target.closest('.pstep[data-step]');
+      if (step) {
+        const node = nodes[step.dataset.step];
+        open = false; render();
+        if (node) stage.scrollTo({ top: node.offsetTop - 24, behavior: REDUCED ? 'auto' : 'smooth' });
+      }
+    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && open) { open = false; render(); } });
+    document.addEventListener('click', (e) => { if (open && !dock.contains(e.target)) { open = false; render(); } });
+
+    return {
+      enter(n, node) {
+        nodes[n] = node;
+        current = n;
+        done = n - 1;
+        dock.hidden = false;
+        render();
+      },
+      finish() { done = TOTAL; current = 0; render(); }
+    };
+  })();
+
+  /* Assistant waiting states — thresholds from the Figma component:
+     <400ms nothing, 400ms dots, 2.5s Thinking (brain), 8s + reassurance line. */
+  async function aiWait(ms) {
+    if (ms < 400) { await sleep(ms); return; }
+    const row = add(el(`<div class="ai-row"><div class="ai-avatar">${BYS_MARK}</div>
+        <div class="ai-body"><div class="status"><div class="dots"><i></i><i></i><i></i></div></div></div></div>`));
+    const status = row.querySelector('.status');
+    const timers = [];
+    if (ms > 2500) timers.push(setTimeout(() => {
+      status.innerHTML = `<div class="status-row">${ICON.brain}<span class="status-label t-body-small shimmer-text">Thinking&hellip;</span></div>`;
+    }, 2500));
+    if (ms > 8000) timers.push(setTimeout(() => {
+      status.insertAdjacentHTML('beforeend', `<div class="status-note t-caption">Still thinking — this one&rsquo;s taking a moment</div>`);
+    }, 8000));
+    await sleep(ms);
+    timers.forEach(clearTimeout);
+    row.remove();
+  }
+
+  let beat = 0;
+  const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const nextDelay = () => { const d = Math.max(600, 1400 - beat * 250); beat++; return d; };
+
+  /* ---------------- reading room ----------------
+     A step used to arrive in one piece: two lines and the card they introduce, all inside
+     half a second. Each is readable on its own; together they land as a wall and you feel
+     you have missed something. So a turn owes the turn before it the time it takes to read
+     — measured from the length of what was just said, because a one-line answer and a
+     four-line pitch are not the same ask.
+
+     The debt is a floor, never a ceiling: an authored delay longer than the reading time
+     still wins, so nothing anyone tuned by hand gets shortened. It is spent on the typing
+     indicator rather than on silence, which is what the assistant would be doing anyway.
+     A user turn clears it — acting on a line is proof of having read it. */
+  let owed = 0, said = 0;
+  const readTime = (html) => {
+    const chars = html.replace(/<[^>]*>/g, '').replace(/&[a-z]+;/g, ' ').length;
+    return Math.min(2200, 450 + chars * 12);
+  };
+  /* What a block owes the line that introduced it — but only when the assistant has just
+     said two things in a row, which is the case that arrives as a wall. After a single
+     line the options are the other half of the same turn, and holding them back reads as
+     the prototype having stalled rather than as a beat. */
+  const settle = async () => {
+    const w = said > 1 ? owed : 0;
+    owed = 0; said = 0;
+    if (w) await sleep(w);
+  };
+
+  async function ai(html, delay) {
+    await aiWait(Math.max(delay === undefined ? nextDelay() : delay, owed));
+    owed = readTime(html);
+    said++;
+    const row = el(`<div class="ai-row fade-in"><div class="ai-avatar">${BYS_MARK}</div>
+        <div class="ai-body">
+          <div class="ai-label t-label-assistant">AI Assistant</div>
+          <div class="ai-bubble t-body-default">${html}</div>
+        </div></div>`);
+    if (!anchor || !anchor.isConnected) anchor = row;   /* only if no step is holding the top */
+    return add(row);
+  }
+  function you(text) {
+    owed = 0; said = 0;       /* they answered, so they read it */
+    add(el(`<div class="user-row fade-in"><div class="user-bubble t-body-default-emph">${text}</div></div>`));
+  }
+
+  async function askPills(options) {
+    await settle();
+    return new Promise(resolve => {
+      const row = el(`<div class="pill-rows fade-in"></div>`);
+      options.forEach(opt => {
+        const pill = el(`<button class="pill" type="button">${opt.icon}<span>${opt.name}</span></button>`);
+        pill.addEventListener('click', () => {
+          row.querySelectorAll('.pill').forEach(p => p.disabled = true);
+          pill.classList.add('selected');
+          setTimeout(() => { row.remove(); resolve(opt.name); }, 220);
+        });
+        row.appendChild(pill);
+      });
+      add(row);
+    });
+  }
+
+  async function askDesigns() {
+    await settle();
+    return new Promise(resolve => {
+      const head = add(el(`<div class="choose-row fade-in">
+          <span class="hint t-caption">Choose 2 of 6</span>
+          <span class="counter t-caption-emph">0 of 2 selected</span>
+        </div>`));
+      const grid = el(`<div class="card-grid fade-in"></div>`);
+      const picked = [];
+      DESIGNS.forEach(d => {
+        const card = el(`<button class="design-card" type="button" style="background-image:url('${d.img}')" aria-label="${d.name}"><span class="badge"></span></button>`);
+        card.addEventListener('click', () => {
+          const i = picked.indexOf(d);
+          if (i > -1) { picked.splice(i, 1); card.classList.remove('selected'); }
+          else { if (picked.length >= 2) return; picked.push(d); card.classList.add('selected'); }
+          grid.querySelectorAll('.design-card').forEach(c => {
+            c.disabled = picked.length >= 2 && !c.classList.contains('selected');
+          });
+          picked.forEach((p, idx) => {
+            const node = grid.children[DESIGNS.indexOf(p)];
+            node.querySelector('.badge').textContent = idx + 1;
+          });
+          const counter = head.querySelector('.counter');
+          counter.textContent = `${picked.length} of 2 selected`;
+          counter.classList.toggle('full', picked.length === 2);
+          cont.disabled = picked.length !== 2;
+        });
+        grid.appendChild(card);
+      });
+      add(grid);
+      const row = el(`<div class="btn-row fade-in"></div>`);
+      const cont = el(`<button class="btn" type="button" disabled>Continue ${ICON.arrowRight}</button>`);
+      cont.addEventListener('click', () => {
+        grid.querySelectorAll('.design-card').forEach(c => c.disabled = true);
+        row.remove();
+        resolve(picked.slice());
+      });
+      row.appendChild(cont);
+      add(row);
+    });
+  }
+
+  /* The first option is the action; everything after it is the way out. That is the
+     rule everywhere else in the funnel, so it lives here rather than in each caller —
+     two call sites had drifted to a row of two primaries. Pass a string, or
+     {label, icon} when the button needs a leading glyph. */
+  async function askButtons(options) {
+    await settle();
+    return new Promise(resolve => {
+      const row = el(`<div class="btn-row fade-in"></div>`);
+      options.forEach((o, i) => {
+        const label = typeof o === 'string' ? o : o.label;
+        const icon = (typeof o === 'object' && o.icon) ? o.icon + ' ' : '';
+        const b = el(`<button class="btn${i ? ' btn-secondary' : ''}" type="button">${icon}${label}</button>`);
+        b.addEventListener('click', () => { row.remove(); resolve(label); });
+        row.appendChild(b);
+      });
+      add(row);
+    });
+  }
+
+  /* while the user is on Shopify, this tab asks to be come back to — with 30 tabs open, the title is the only handle we have */
+  const BASE_TITLE = document.title;
+  let titleTimer = null;
+  function callMeBack(on) {
+    clearInterval(titleTimer);
+    if (!on) { document.title = BASE_TITLE; return; }
+    let flip = false;
+    document.title = '← Come back to finish';
+    titleTimer = setInterval(() => {
+      flip = !flip;
+      document.title = flip ? 'Waiting for you…' : '← Come back to finish';
+    }, 1400);
+  }
+
+  /* The return leg. Shopify sends no callback, so we have to ask; the answer is
+     then verified against Shopify. While he's away the tab title is the only
+     handle we have on his attention. */
+  async function confirmActivation(shopUrl) {
+    while (true) {
+      const onBack = () => { if (document.visibilityState === 'visible') callMeBack(false); };
+      document.addEventListener('visibilitychange', onBack);
+
+      await ai('Did you activate the plan on Shopify?', 400);
+      const row = add(el(`<div class="cta-row fade-in">
+          <button class="btn" id="yesBtn" type="button">Yes, it&rsquo;s active</button>
+          <button class="btn btn-secondary" id="notYetBtn" type="button">${ICON.rotate} Not yet — reopen Shopify</button>
+        </div>`));
+
+      const choice = await new Promise(resolve => {
+        row.querySelector('#yesBtn').addEventListener('click', () => resolve('yes'), { once: true });
+        row.querySelector('#notYetBtn').addEventListener('click', () => resolve('notYet'), { once: true });
+      });
+
+      document.removeEventListener('visibilitychange', onBack);
+      callMeBack(false);
+      row.remove();
+
+      if (choice === 'yes') { you('Yes, it&rsquo;s active'); return 'confirmed'; }
+
+      you('Not yet — reopen Shopify');
+      callMeBack(true);
+      await handoff(shopUrl, 'Opening Shopify again…', 1100);
+    }
+  }
+
+  /* The check came back empty — which is not proof he didn't pay. It can lag, or
+     miss him entirely. So we report what we see, never what he did, and both ways
+     out lead back through the check: there is no "continue anyway", because the
+     plan is what Shopify publishes on. Verifying leads, because he has just told
+     us he paid — sending him back to Shopify first would be refusing his word. */
+  async function planNotFound(shopUrl, attempt) {
+    if (attempt === 1) {
+      await ai('I don&rsquo;t see an active plan on Shopify yet &mdash; it can take a moment to come through.', 500);
+    } else {
+      await ai('Still nothing on Shopify&rsquo;s side. If you just approved it, give it a minute and verify again.', 500);
+    }
+
+    const verify = attempt === 1 ? 'I already paid &mdash; verify now' : 'Verify again';
+    const row = add(el(`<div class="cta-row fade-in">
+        <button class="btn" id="recheckBtn" type="button">${verify}</button>
+        <button class="btn btn-secondary" id="reopenBtn" type="button">${ICON.squareArrowOutUpRight} Open Shopify</button>
+      </div>`));
+
+    const choice = await new Promise(resolve => {
+      row.querySelector('#reopenBtn').addEventListener('click', () => resolve('reopen'), { once: true });
+      row.querySelector('#recheckBtn').addEventListener('click', () => resolve('recheck'), { once: true });
+    });
+    row.remove();
+
+    if (choice === 'recheck') { you(verify); return 'recheck'; }
+
+    you('Open Shopify');
+    callMeBack(true);
+    await handoff(shopUrl, 'Opening Shopify again…', 1100);
+    return 'reopen';
+  }
+
+  /* The step opened by promising a three-stop journey, so it closes by finishing
+     it rather than by announcing anything: node 2 turns green and its check draws
+     itself, the leg to node 3 fills, then node 3 becomes current. Only that leg
+     fills — it is the one just travelled. */
+  /* The path used to finish itself: the check drew on, a connector filled green and the
+     third node lit up. She cut all three — the connectors are one flat rail now and there
+     is no "active mark" state — so this is a state change and nothing more. */
+  function completePath() {
+    const n2 = $('pathNode2');
+    n2.className = 'path-node done';
+    n2.querySelector('.path-circle').innerHTML = ICON.check;
+  }
+
+  /* 06 · Store type. Copy is production's, word for word. There is no photograph of
+     a Professional store to show, so each card is identified by a single icon rather
+     than by imagery — inventing a storefront shot would be selling a picture of
+     something we have not built for this user. */
+  async function askStoreType() {
+    await settle();
+    return new Promise(resolve => {
+      const PRO = [
+        'Expert-designed store ready to launch',
+        'Proven copywriting that sells for you',
+        'Sales funnel included, no setup needed',
+        'Fast US shipping, no delays',
+        'Winning ads ready to bring in traffic'
+      ];
+
+      add(el(`<div class="types fade-in">
+          <div class="type type--pro">
+            <span class="ribbon t-caption-emph">One time offer</span>
+            <div class="type-head">
+              <div class="type-icon">${ICON.galleryThumbnails}</div>
+              <div class="type-name t-body-default-emph">Professional one product store</div>
+            </div>
+            <div class="type-body">
+              <div class="type-col">
+                <ul class="type-list">${PRO.map(t =>
+                  `<li class="yes">${ICON.circleCheck}<span class="t-body-small">${t}</span></li>`
+                ).join('')}</ul>
+                <div class="type-price">
+                  <span class="t-body-default-emph">Total for one time payment:</span>
+                  <s class="t-body-small">$197</s>
+                  <span class="t-body-default-emph">$97</span>
+                </div>
+              </div>
+              <div class="type-shot">
+                <img src="images/pro%20type%201.png" alt="A one-product store built by BuildYourStore">
+              </div>
+            </div>
+          </div>
+        </div>`));
+
+      const row = add(el(`<div class="btn-row fade-in">
+          <button class="btn" data-type="pro" type="button">Continue like the pros ${ICON.arrowRight}</button>
+          <button class="btn btn-secondary" data-type="free" type="button">Keep the free store</button>
+        </div>`));
+      row.querySelectorAll('button').forEach(b =>
+        b.addEventListener('click', () => { row.remove(); resolve(b.dataset.type); }, { once: true }));
+    });
+  }
+
+  /* Production's Payment details modal, rebuilt on our tokens. The store image is
+     ours, not production's mockup. Fields are real so the focus state can be seen;
+     nothing is submitted anywhere. */
+  function paymentModal(price) {
+    return new Promise(resolve => {
+      const back = el(`<div class="modal-back fade-in">
+          <div class="modal" role="dialog" aria-modal="true" aria-label="Payment details">
+            <div class="modal-head">
+              <div class="modal-title">Payment details</div>
+              <button class="modal-close" id="modalClose" type="button" aria-label="Close">${ICON.close}</button>
+            </div>
+
+            <div class="modal-item">
+              <img src="images/pro%20type%201.png" alt="A one-product store built by BuildYourStore">
+              <div class="modal-item-body">
+                <div class="modal-item-name t-body-default-emph">Professional one product store &middot; ${state.niche}</div>
+                <div class="t-body-small" style="color:var(--muted-foreground)">Your store built around a single, high-converting product. Designed for speed, simplicity, and maximum focus.</div>
+              </div>
+              <div class="modal-price">
+                <b class="t-body-default-emph">$${price}</b>
+                <span class="t-caption" style="color:var(--muted-foreground)">for lifetime</span>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="cardNo">Card number</label>
+              <div class="control">
+                <input id="cardNo" type="text" readonly autocomplete="off" placeholder="xxxx xxxx xxxx xxxx">
+                ${ICON.creditCard}
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label class="field-label" for="cardExp">Expiration date</label>
+                <div class="control"><input id="cardExp" type="text" readonly autocomplete="off" placeholder="dd/mm/yy"></div>
+              </div>
+              <div class="field">
+                <label class="field-label" for="cardCvc">Security code</label>
+                <div class="control">
+                  <input id="cardCvc" type="text" readonly autocomplete="off" placeholder="CVC">
+                  ${ICON.info}
+                </div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="country">Country</label>
+              <div class="control">
+                <select id="country">
+                  <option>Select country</option><option>United States</option>
+                  <option>United Kingdom</option><option>Ukraine</option><option>Germany</option>
+                </select>
+                ${ICON.chevronDown}
+              </div>
+            </div>
+
+            <button class="btn" id="buyBtn" type="button" style="width:100%">Buy now</button>
+            <div class="modal-foot t-body-small">${ICON.shield}<span>100% secure &amp; safe payment</span></div>
+          </div>
+        </div>`);
+
+      shell.appendChild(back);
+      const done = outcome => { back.remove(); resolve(outcome); };
+      back.querySelector('#buyBtn').addEventListener('click', () => done('paid'), { once: true });
+      back.querySelector('#modalClose').addEventListener('click', () => done('closed'), { once: true });
+      back.addEventListener('click', e => { if (e.target === back) done('closed'); });
+    });
+  }
+
+  /* The downsell, built from 413:6132. It used to be one sentence and two buttons on
+     the argument that the card was a few messages up — but by this point the merchant
+     has said no to that card, so repeating the price without re-making the case was
+     asking them to change their mind on no new information.
+
+     Three things carry it now. The picture argues the only thing still unanswered —
+     the work is already done — rather than "a nicer store", which has just lost. The
+     heading and the ribbon carry the offer. And the price is held, by us, for ten
+     minutes: a clock with an object rather than a countdown to nothing.
+
+     The step before this one used to say "you won't be able to unlock it again" and
+     then unlock it again a line later. That bluff is gone; declining now goes straight
+     to the better offer, which is one move instead of two and costs nothing to say. */
+  async function offerDownsell() {
+    /* Takes the top of the screen the way a step does. It is not a step, but it is a new
+       subject and a tall block, and leaving it anchored to the store-type card above meant
+       arriving half in view. Whatever they want to re-read is a scroll away. */
+    startsFresh();
+    await ai('Before you launch &mdash; I can still build it, and it&rsquo;s $47 instead of $97 if you take it now.', 500);
+
+    const ROWS = [
+      [ICON.sparkles,  'Expert-designed store, ready to launch'],
+      [ICON.penLine2,  'Proven copywriting'],
+      [ICON.funnel,    'Sales funnel included']
+    ];
+    const card = add(el(`<div class="pro fade-in">
+        <div class="ribbon t-caption-emph">SAVE 52%</div>
+        <img class="pro-art" src="images/pro/Container_downsell.png"
+             alt="The Pro store: a finished storefront, the work already ticked off, and 10.5K store owners">
+        <div class="pro-body">
+          <div class="pro-top">
+            <div class="pro-head t-body-default-emph">Get your PRO store to get more orders</div>
+            <ul class="pro-list">${ROWS.map(([ic, t]) =>
+              `<li>${ic}<span class="t-body-default">${t}</span></li>`).join('')}</ul>
+          </div>
+          <div class="pro-price">
+            <div class="pro-now">
+              <span class="pro-pair">
+                <span class="pro-was t-body-small">$97.00</span>
+                <span class="t-body-default-emph" data-price>$47 today</span>
+              </span>
+              <span class="pro-clock t-body-small">${ICON.clock}
+                <span data-clock-label>Price held for</span><b data-clock>10:00</b></span>
+            </div>
+            <div class="pro-terms t-body-small">One payment, not a subscription.</div>
+          </div>
+        </div>
+      </div>`));
+
+    const row = add(el(`<div class="cta-row fade-in">
+        <button class="btn" data-type="pro47" type="button">Upgrade for $47</button>
+        <button class="btn-link t-body-link" data-type="free" type="button">Launch without it</button>
+      </div>`));
+
+    /* the clock is real, and when it runs out it takes the price with it — the card is
+       still sitting in the transcript, so a lapsed timer that changed nothing would be
+       visible proof that the deadline never meant anything */
+    let expired = false;
+    const seconds = shortOffer ? 10 : 600;
+    const ends = Date.now() + seconds * 1000;
+    const tick = setInterval(() => {
+      const left = Math.max(0, Math.round((ends - Date.now()) / 1000));
+      if (left > 0) {
+        card.querySelector('[data-clock]').textContent =
+          String(Math.floor(left / 60)).padStart(2, '0') + ':' + String(left % 60).padStart(2, '0');
+        return;
+      }
+      clearInterval(tick);
+      expired = true;
+      card.classList.add('is-over');
+      card.querySelector('[data-price]').textContent = '$97 today';
+      card.querySelector('[data-clock-label]').textContent = 'Price no longer held';
+      card.querySelector('[data-clock]').remove();
+      row.querySelector('[data-type="pro47"]').textContent = 'Upgrade for $97';
+    }, 250);
+
+    const choice = await new Promise(resolve => {
+      row.querySelectorAll('button').forEach(b =>
+        b.addEventListener('click', () => resolve(b.dataset.type), { once: true }));
+    });
+    clearInterval(tick);
+    const bought = choice !== 'free';
+    you(bought ? (expired ? 'Upgrade for $97' : 'Upgrade for $47') : 'Launch without it');
+    row.remove();
+    /* pay what the card says: if the clock ran out first, it is the full price */
+    return bought ? (expired ? 'pro' : 'pro47') : 'free';
+  }
+
+  /* The real build. Deliberately NOT a store-assembling animation: products arrive
+     with the AutoDS step further on, so a storefront filling up here would show
+     something that does not exist yet. Full screen, ~8s, then it gets out of the way. */
+  /* The build, in the transcript. Six lines, eight seconds. The steps are supporting
+     text under the header — one weight throughout, no emphasised verb. */
+  async function buildCeremony() {
+    const steps = [
+      'Preparing your store',
+      'Applying your theme',
+      'Customizing your storefront',
+      `Adding ${state.designs.map(d => d.name).join(' and ')}`,
+      'Organizing your collections'
+    ];
+    steps.push('Finishing up');
+
+    const block = add(el(`<div class="working fade-in">
+        <button class="working-head" type="button">
+          <span class="working-ic"><span class="brain">${ICON.brain}</span><span class="tick">${ICON.check}</span></span>
+          <span class="working-title t-body-default-emph">Making your store unique</span>
+          <span class="working-meta t-body-small"></span>
+          <span class="working-chev">${ICON.chevronDown}</span>
+        </button>
+        <div class="working-list">${steps.map(t =>
+          `<div class="working-row t-body-small">
+              <span class="working-mk"><i></i>${ICON.check}</span>
+              <span class="working-label">${t}</span>
+            </div>`
+        ).join('')}</div>
+      </div>`));
+
+    const rows = [...block.querySelectorAll('.working-row')];
+    const per = Math.round(8000 / rows.length);
+
+    for (let i = 0; i < rows.length; i++) {
+      rows[i].classList.add('active');
+      await sleep(per);
+      /* the build gives up partway. The row it stopped on goes back to waiting rather than
+         to an error: the backend does not report which stage failed, so marking one would
+         be inventing the cause. The failure is told in the next line of the conversation. */
+      if (failBuild && i === 2) { rows[i].classList.remove('active'); return 'failed'; }
+      rows[i].classList.remove('active');
+      rows[i].classList.add('done');
+    }
+    await sleep(500);
+
+    /* Done, so it folds into one line. The transcript keeps the record — including which
+       designs the store was built from — without keeping six rows of it in every scroll.
+       A failed build never gets here: that block stays open on the row it stopped at,
+       because that is the one moment the detail is worth reading. */
+    block.classList.add('done');
+    block.querySelector('.working-title').textContent = 'Built your store';
+    block.querySelector('.working-meta').textContent = `\u00b7 ${rows.length} steps`;
+    block.querySelector('.working-head')
+      .addEventListener('click', () => block.classList.toggle('open'));
+    return 'ok';
+  }
+
+  /* The seven-step manual production prints on the page itself, moved behind a link.
+     It is not the step's argument — the card is — but it is the only thing that helps
+     someone who is already on AutoDS's screens and lost, which is exactly who asks.
+     Production's step 1 was "Click Register to AutoDS below" and its step 7 named a "Done"
+     button. Neither exists here, and step 1 stopped existing at all once the modal grew a
+     button of its own — an instruction to press the button directly under it is not an
+     instruction. The last line names our question instead of production's "Done"; the rest
+     is production's wording untouched.
+     Screenshots exported from vNRDM0AN3UrhTXfqh0W88H → 5613:144110-144116 at their
+     own crop, so they match what the merchant will actually see. */
+  function autodsGuide(onStart) {
+    const STEPS = [
+      ['Enter your name, set your password, and click <b>Join</b>.', 'step-join'],
+      ['Choose <b>Shopify</b>.', 'step-channel'],
+      ['Choose plan.', 'step-plan'],
+      ['Choose payment method.', 'step-payment'],
+      ['Connect your new store and add top-selling products from the AutoDS marketplace.', null],
+      ['Come back to this tab and tell me you&rsquo;re done.', null]
+    ];
+    const back = el(`<div class="modal-back fade-in">
+        <div class="modal modal--guide" role="dialog" aria-modal="true" aria-label="How to register in AutoDS">
+          <div class="modal-head">
+            <div class="modal-title">How to register in AutoDS</div>
+            <button class="modal-close" type="button" aria-label="Close">${ICON.close}</button>
+          </div>
+          <ol class="guide">${STEPS.map(([t, img]) =>
+            `<li><p class="t-body-default">${t}</p>${
+              img ? `<img src="images/autods/${img}.jpg" alt="">` : ''}</li>`).join('')}</ol>
+          ${onStart ? `<div class="modal-go">
+            <button class="btn" type="button">Start AutoDS free trial ${ICON.squareArrowOutUpRight}</button>
+          </div>` : ''}
+        </div>
+      </div>`);
+    const onKey = e => { if (e.key === 'Escape') close(); };
+    const close = () => { back.remove(); document.removeEventListener('keydown', onKey); };
+    back.querySelector('.modal-close').addEventListener('click', close);
+    const go = back.querySelector('.modal-go button');
+    if (go) go.addEventListener('click', () => { close(); onStart(); }, { once: true });
+    /* the backdrop only closes on a click that also began on it — otherwise the very
+       click that opens the modal can land on the backdrop underneath and close it */
+    let fromBack = false;
+    back.addEventListener('mousedown', e => { fromBack = e.target === back; });
+    back.addEventListener('click', e => { if (fromBack && e.target === back) close(); fromBack = false; });
+    document.addEventListener('keydown', onKey);
+    shell.appendChild(back);
+  }
+
+  const GUIDE_LINK = 'How to register in AutoDS';
+
+  /* 07 · Add top-selling products. Production shows a seven-step manual with six
+     AutoDS screenshots; I first compressed that to four steps, which was still the
+     wrong axis — Olena: "люди не знають шо таке аутодс від слова зовсім". Nobody
+     here has heard of it, so the card explains the product, not the procedure — and
+     the procedure stays one click away for whoever needs it. */
+  async function addProducts() {
+    divider('05 · Add top-selling products');
+    await ai(`Now the products for your ${state.niche} store. They come from AutoDS &mdash; that&rsquo;s ours too, not a third party.`, 900);
+    await ai('You find products there, import them here, and orders fulfil themselves.', 600);
+
+    const DOES = [
+      [ICON.package,       'Auto-import winning products'],
+      [ICON.truck,         'Automatic order fulfillment'],
+      [ICON.refreshCw,     'Price &amp; inventory sync'],
+      [ICON.mapPinHouse,   'Tracking &amp; returns']
+    ];
+
+    add(el(`<div class="autods fade-in">
+        <img class="autods-shot" src="images/autods%20image.png"
+             alt="The AutoDS dashboard: orders, fulfilment and profit tracking">
+        <div class="autods-body">
+          <div class="t-body-default-emph">Fill your store with winning products</div>
+          <ul class="autods-list">${DOES.map(([ic, t]) =>
+            `<li>${ic}<span class="t-body-small">${t}</span></li>`).join('')}</ul>
+          <div class="autods-price">
+            <span class="t-body-default-emph">$0.99 for 3 days</span>
+            <span class="then t-body-small">Then $39.90/month after your 3-day trial. Cancel anytime.</span>
+          </div>
+        </div>
+      </div>`));
+
+    const row = add(el(`<div class="cta-row fade-in">
+        <button class="btn" id="autodsBtn" type="button">Start AutoDS free trial ${ICON.squareArrowOutUpRight}</button>
+        <button class="btn-link t-body-link" type="button">${GUIDE_LINK}</button>
+      </div>`));
+    /* the manual ends on the same button the chat offers, so reading it is not a detour */
+    row.querySelector('.btn-link').addEventListener('click',
+      () => autodsGuide(() => row.querySelector('#autodsBtn').click()));
+    await new Promise(r => row.querySelector('#autodsBtn').addEventListener('click', r, { once: true }));
+    you('Start AutoDS free trial');
+    row.remove();
+
+    callMeBack(true);
+    await handoff('autods.com/register', 'Opening AutoDS&hellip;', 1300);
+
+    /* a soft gate: opening it is the signal, so the answer is not verified against
+       anything — unlike the Shopify plan, nothing here blocks publishing */
+    while (true) {
+      const onBack = () => { if (document.visibilityState === 'visible') callMeBack(false); };
+      document.addEventListener('visibilitychange', onBack);
+      await ai('All set on AutoDS?', 500);
+      /* the manual stays reachable on the return leg — this is the moment someone who
+         got stuck on AutoDS's screens comes back, so the answer they need is here and
+         not only beside a button they have already pressed. askButtons renders its row
+         synchronously, so the link lands under it rather than above. */
+      const ask = askButtons(['Yes, I&rsquo;m done',
+        { label: 'Not yet &mdash; reopen AutoDS', icon: ICON.rotate }]);
+      const guide = add(el(`<div class="btn-row fade-in">
+          <button class="btn-link t-body-link" type="button">${GUIDE_LINK}</button>
+        </div>`));
+      /* on the return leg the same button means "take me back there", which is what the
+         outline button beside it already says */
+      guide.querySelector('button').addEventListener('click',
+        () => autodsGuide(() => [...document.querySelectorAll('.btn-row .btn')]
+          .find(b => b.textContent.indexOf('Not yet') > -1).click()));
+      const pick = await ask;
+      guide.remove();
+      document.removeEventListener('visibilitychange', onBack);
+      callMeBack(false);
+      you(pick);
+      if (pick.indexOf('Yes') > -1) break;
+      callMeBack(true);
+      await handoff('autods.com/register', 'Opening AutoDS again&hellip;', 1100);
+    }
+    await storeLive();
+  }
+
+  /* 08 · Store live. The mobile screen leads with "Your Shopify Store Is Live!" and
+     then explains, in a box below, that nobody can see it. Both are true; in a chat
+     the assistant can only say one thing first, so it says the state, not the cheer. */
+  async function storeLive() {
+    divider('06 · Store live');
+    await ai(`Your ${state.niche} store is live.`, 900);
+    await ai('One thing is still in the way: Shopify puts a password on every new store, so right now you are the only one who can see it.', 600);
+
+    add(el(`<div class="preview fade-in">
+        <div class="preview-chrome">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="preview-url t-caption">yourstore.myshopify.com</span>
+        </div>
+        <div class="live-view">
+          <img src="images/store-preview-pet.jpg" alt="Your ${state.niche} storefront">
+          <div class="live-products">
+            <img class="live-card live-card--a" src="images/product1.png" alt="">
+            <img class="live-card live-card--b" src="images/product2.png" alt="">
+            <img class="live-card live-card--c" src="images/Frame.png" alt="">
+            <span class="live-card live-more"><b>+7</b><span>products</span></span>
+          </div>
+        </div>
+      </div>`));
+
+    add(el(`<div class="howto fade-in">
+        <div class="t-body-default-emph">Want everyone to see it?</div>
+        <div class="howto-path t-body-small">Go to Shopify Admin &gt; Settings &gt; Preferences &gt; <u>Store Password</u></div>
+      </div>`));
+
+    /* removing the password is optional — Continue is never blocked on it */
+    while (true) {
+      const row = add(el(`<div class="btn-row fade-in">
+          <button class="btn" data-go="continue" type="button">Continue ${ICON.arrowRight}</button>
+          <button class="btn btn-secondary" data-go="settings" type="button">${ICON.squareArrowOutUpRight} Open Shopify settings</button>
+        </div>`));
+      const pick = await new Promise(r => row.querySelectorAll('button').forEach(b =>
+        b.addEventListener('click', () => r(b.dataset.go), { once: true })));
+      you(pick === 'continue' ? 'Continue' : 'Open Shopify settings');
+      row.remove();
+      if (pick === 'continue') break;
+      await handoff('admin.shopify.com/settings/preferences', 'Opening Shopify settings&hellip;', 1300);
+    }
+    await foundUs();
+  }
+
+  /* 09 · How you found us. The mobile screen is nine full-width rows; here they are
+     pills, the same shape the niche question uses, because it is the same kind of
+     question. Six marks are brand logos and stay as the supplied SVGs — the
+     Lucide-only rule covers icons, not logos, the same reason the BYS mark is fine. */
+  async function askSource() {
+    await settle();
+    const LOGO = f => `<img src="images/External%20platforms/External%20platforms/Property%201=${f}.svg" alt="">`;
+    const SOURCES = [
+      { name: 'AI search',            icon: LOGO('AI') },
+      { name: 'Instagram',            icon: LOGO('Instagram') },
+      { name: 'Google',               icon: LOGO('Google') },
+      { name: 'Courses',              icon: ICON.graduationCap },
+      { name: 'Facebook',             icon: LOGO('Facebook') },
+      { name: 'TikTok',               icon: LOGO('TikTok') },
+      { name: 'YouTube',              icon: LOGO('Youtube') },
+      { name: 'Friends &amp; colleagues', icon: ICON.users },
+      { name: 'Other',                icon: ICON.ellipsis }
+    ];
+
+    return new Promise(resolve => {
+      const rows = add(el(`<div class="pill-rows fade-in">${SOURCES.map(o =>
+        `<button class="pill t-body-default-emph" type="button">${o.icon}<span>${o.name}</span></button>`
+      ).join('')}</div>`));
+      const skip = add(el(`<div class="btn-row fade-in">
+          <button class="btn-link t-body-link" type="button">Skip for now</button>
+        </div>`));
+
+      const done = answer => { rows.remove(); skip.remove(); resolve(answer); };
+      rows.querySelectorAll('.pill').forEach(b =>
+        b.addEventListener('click', () => done(b.querySelector('span').innerHTML), { once: true }));
+      skip.querySelector('button').addEventListener('click', () => done('Skip for now'), { once: true });
+    });
+  }
+
+  async function askChips(labels) {
+    await settle();
+    return new Promise(resolve => {
+      const rows = add(el(`<div class="pill-rows fade-in">${labels.map(l =>
+        `<button class="pill t-body-default-emph" type="button">${l}</button>`).join('')}</div>`));
+      rows.querySelectorAll('.pill').forEach(b =>
+        b.addEventListener('click', () => { rows.remove(); resolve(b.textContent.trim()); }, { once: true }));
+    });
+  }
+
+  /* Production asks a free-text follow-up on everything except the three answers that
+     name themselves — AI search, Google, Friends & colleagues. Marketing needs to know
+     where the merchant actually came from, so it is carried over as-is: six of the nine
+     get a second turn. The field is optional, the way production's step-level skip makes
+     it optional there. */
+  const NEEDS_DETAIL = ['Instagram', 'Courses', 'Facebook', 'TikTok', 'YouTube', 'Other'];
+
+  function detailField(placeholder) {
+    return new Promise(resolve => {
+      const box = add(el(`<div class="ask-field fade-in">
+          <div class="dom-input" style="width:100%">
+            <span class="control"><input type="text" autocomplete="off" placeholder="${placeholder}"></span>
+            <button class="btn" type="button">Save</button>
+          </div>
+          <button class="btn-link t-body-link" type="button">Skip</button>
+        </div>`));
+      const input = box.querySelector('input');
+      const done = v => { box.remove(); resolve(v); };
+      box.querySelector('.btn').addEventListener('click', () => done(input.value.trim() || null), { once: true });
+      box.querySelector('.btn-link').addEventListener('click', () => done(null), { once: true });
+      input.focus();
+    });
+  }
+
+  async function foundUs() {
+    startsFresh();
+    await ai('One question that only helps us: how did you hear about BuildYourStore?', 900);
+    const pick = await askSource();
+    you(pick);
+
+    /* YouTube is the one answer that asks two things: what, and then whose. */
+    if (pick === 'YouTube') {
+      await ai('What did you watch?', 500);
+      you(await askChips(['Short videos', 'Long videos']));
+    }
+
+    if (NEEDS_DETAIL.includes(pick)) {
+      await ai(pick === 'YouTube' ? 'And which channel was it?' : 'Where exactly did you hear about us?', 500);
+      const detail = await detailField(pick === 'YouTube'
+        ? 'Channel name'
+        : 'Creator or course name');
+      if (detail) you(detail);
+    }
+
+    await ai(pick === 'Skip for now' ? 'No problem.' : 'Thanks &mdash; that&rsquo;s genuinely useful to know.', 600);
+    await domainStep();
+  }
+
+  /* 10 · Domain. The embedded app's three phases carried over (offer → account →
+     connect), with the one inversion Olena asked for: the suggestions come first and
+     the open field only opens if he wants a name of his own. That also keeps typing
+     opt-in rather than the default. No skip — as in the current flow, the only defer
+     sits on the connect phase, where the domain is already secured. */
+  const MERCHANT = { name: 'Alex Morgan', email: 'alex@yourstore.myshopify.com' };   // demo stand-ins
+
+  /* Resolves with `{failed}` when the pick does not survive its check, so the caller can
+     answer in the conversation and put the remaining choice back underneath it. Same rule
+     as every other choice here: the options come away once they are answered. */
+  function domainRows(names, taken) {
+    return new Promise(resolve => {
+      const list = add(el(`<div class="dom-list fade-in">${names.map(d =>
+        `<div class="dom-row"><span class="dom-name t-body-default">${d}</span>
+          <span class="dom-taken t-body-small" hidden>${ICON.circleX}Already taken</span>
+          <button class="dom-get" type="button" data-name="${d}">Get it</button></div>`).join('')}</div>`));
+      const other = add(el(`<div class="dom-other fade-in">
+          <button class="t-body-link" type="button">I want another name</button>
+        </div>`));
+      const done = v => { list.remove(); other.remove(); resolve(v); };
+      list.querySelectorAll('.dom-get').forEach(b =>
+        b.addEventListener('click', () => {
+          const name = b.dataset.name;
+          done(taken.includes(name) ? { failed: name } : name);
+        }, { once: true }));
+      other.querySelector('button').addEventListener('click', () => done(null), { once: true });
+    });
+  }
+
+  /* What comes back after a failed check, as one block under the assistant's reply: the
+     name that died with its error, the suggestions still standing, and a field — because
+     the other half of the problem was that there was no way to type a name at all. */
+  function domainRetry(all, dead, taken) {
+    return new Promise(resolve => {
+      const rest = all.filter(d => d !== dead);
+      const box = add(el(`<div class="dom-retry fade-in">
+          <div class="dom-list">
+            ${dead ? `<div class="dom-row err"><span class="dom-name t-body-default">${dead}</span>
+              <span class="dom-taken t-body-small">${ICON.circleX}Already taken</span></div>` : ''}
+            ${rest.map(d => `<div class="dom-row"><span class="dom-name t-body-default">${d}</span>
+              <button class="dom-get" type="button" data-name="${d}">Get it</button></div>`).join('')}
+          </div>
+          <div class="dom-input">
+            <span class="control"><input type="text" autocomplete="off" placeholder="Or type your own: yourname.store"></span>
+            <button class="btn" type="button">Save</button>
+          </div>
+          <div class="dom-err t-body-small" hidden>Uh oh. This name is already taken</div>
+        </div>`));
+      const input = box.querySelector('input');
+      const err = box.querySelector('.dom-err');
+      const finish = v => { box.remove(); resolve(v); };
+
+      input.addEventListener('input', () => { err.hidden = true; box.classList.remove('err'); });
+      box.querySelectorAll('.dom-get').forEach(b =>
+        b.addEventListener('click', () => finish(b.dataset.name), { once: true }));
+      box.querySelector('.btn').addEventListener('click', () => {
+        const raw = input.value.trim().toLowerCase();
+        if (!raw) return;
+        const name = raw.endsWith('.store') ? raw : raw + '.store';
+        if (!taken.includes(name)) return finish(name);
+        err.hidden = false;
+        box.classList.add('err');
+      });
+      input.focus();
+    });
+  }
+
+  /* Three things happen at once when a typed name is taken, and each is doing a different
+     job. The field lights up under the input, because that is what a field owes its own
+     input. The assistant says a line, because a list of names appearing on its own reads
+     as the interface twitching rather than someone helping. And the names arrive with it,
+     because making somebody miss twice to earn help is a rule with nothing behind it.
+     The field stays live above them, text selected, so retyping is still one move. */
+  function domainField(taken, alts, announce) {
+    return new Promise(resolve => {
+      const box = add(el(`<div class="dom-field fade-in">
+          <label class="t-body-default-emph" for="domName">Enter your desired domain name</label>
+          <div class="dom-input">
+            <span class="control"><input id="domName" type="text" autocomplete="off" placeholder="Ex: yourname.store"></span>
+            <button class="btn" id="domSave" type="button">Save</button>
+          </div>
+          <div class="dom-err t-body-small" hidden>Uh oh. This name is already taken</div>
+        </div>`));
+      const input = box.querySelector('input');
+      const err = box.querySelector('.dom-err');
+      let list = null, offered = false;
+
+      input.addEventListener('input', () => { err.hidden = true; box.classList.remove('err'); });
+      const finish = v => { box.remove(); if (list) list.remove(); resolve(v); };
+
+      box.querySelector('#domSave').addEventListener('click', async () => {
+        const raw = input.value.trim().toLowerCase();
+        if (!raw) return;
+        const name = raw.endsWith('.store') ? raw : raw + '.store';
+        if (!taken.includes(name)) return finish(name);
+
+        err.hidden = false;
+        box.classList.add('err');
+        input.select();
+        if (offered) return;                    /* one offer is enough; the list is already down */
+        offered = true;
+        await announce();
+        list = add(el(`<div class="dom-list fade-in">${alts.map(a =>
+          `<div class="dom-row"><span class="dom-name t-body-default">${a}</span>
+            <button class="dom-get" type="button" data-name="${a}">Get it</button></div>`).join('')}</div>`));
+        list.querySelectorAll('.dom-get').forEach(b =>
+          b.addEventListener('click', () => finish(b.dataset.name), { once: true }));
+      });
+      input.focus();
+    });
+  }
+
+  async function domainStep() {
+    const slug = state.niche.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const SUGGEST = [`${slug}.store`, `my${slug}.store`, `${slug}shop.store`];
+    const TAKEN = ['shop.store', 'store.store', 'pets.store', 'dog.store', 'cat.store', 'vet.store'];
+    const ALTS = [`${slug}hub.store`, `the${slug}.store`, `${slug}co.store`, `${slug}online.store`];
+
+    divider('07 · Domain');
+    await ai(`Almost there! Give your ${state.niche} store a branded URL that&rsquo;s easy to find, trust and remember.
+        <div class="bub-list">
+          <div>${ICON.gift}<span>Free for one year, then $5.50/year</span></div>
+          <div>${ICON.circlePause}<span>No auto charging</span></div>
+          <div>${ICON.creditCard}<span>No credit card is needed</span></div>
+        </div>`, 900);
+
+    await ai('Here are three that are free right now:', 700);
+
+    /* A name is only free at the moment it is checked, so one listed thirty seconds ago
+       can be gone by the time it is clicked. The merchant hears which one and why, the
+       row keeps the error, and the two remaining suggestions stay live — the open field
+       is offered rather than forced, because two of the three may still suit. */
+    const gone = domainTaken ? SUGGEST[0] : null;
+    const TAKEN_ALL = TAKEN.concat(gone || []);
+
+    let domain = await domainRows(SUGGEST, gone ? [gone] : []);
+    if (domain && domain.failed) {
+      const dead = domain.failed;
+      you(dead);
+      await ai(`Someone registered ${dead} in the last minute &mdash; it was free when I listed it.`, 500);
+      await ai('Here are the other two, or type the name you want:', 500);
+      domain = await domainRetry(SUGGEST, dead, TAKEN_ALL.concat(dead));
+    }
+    if (!domain) {
+      you('I want another name');
+      await ai('Go ahead &mdash; what would you like it to be?', 500);
+      domain = await domainField(TAKEN_ALL, ALTS,
+        () => ai('Here are a few that are free &mdash; or try another name:', 500));
+    }
+    you(domain);
+    state.domain = domain;
+
+    /* Account phase. The embedded app prefills this from the Shopify account so the
+       merchant confirms rather than retypes; its password field is presentational
+       there and is left out here entirely — a chat is no place to ask for one. */
+    await ai(`I&rsquo;ll set up your .store account from your Shopify details &mdash; ${MERCHANT.name}, ${MERCHANT.email}. ${domain} is yours.`, 800);
+    you(await askButtons(['Create account']));
+
+    /* Connect phase, reproduced as it is today: Shopify's own three steps with the
+       admin screenshots, the propagation note, and a defer that is allowed here
+       because the domain is already secured. */
+    await ai('Last part &mdash; connecting it, which happens on Shopify&rsquo;s side.', 800);
+    const STEPS = [
+      ['Click &ldquo;Connect Now&rdquo; below and select &ldquo;Connect existing domain&rdquo; on the Shopify screen:', 'connect-1'],
+      ['Enter your domain in the provided field and click &ldquo;Next&rdquo; as shown below:', 'connect-2'],
+      ['Click &ldquo;Verify connection&rdquo;:', 'connect-3']
+    ];
+    add(el(`<div class="dom-steps fade-in">${STEPS.map(([t, img], i) =>
+      `<div class="dom-step"><span class="t-body-small">${i + 1}. ${t}</span>
+        <img src="images/domain/${img}.png" alt=""></div>`).join('')}</div>`));
+    add(el(`<div class="warnbox t-body-small fade-in">${ICON.alert}
+        <span>The domain is auto-connected after this. Propagation takes up to 24 hours.</span></div>`));
+
+    you(await askButtons([{ label: 'Connect Now', icon: ICON.squareArrowOutUpRight }, 'I&rsquo;ll do it later']));
+    await ugcOffer();
+    await courseStep();
+  }
+
+  /* 11 · UGC offer and 12 · Course. Both hand off to another product on another
+     domain, and the playbook is blunt about the consequence: there is no return
+     signal at all, so the click is the receipt. Production drops the skip and keeps
+     Continue shut until the merchant has been — in a chat that needs no disabled
+     button, because a button that has not appeared yet cannot be pressed. */
+  async function handoffStep(o) {
+    divider(o.divider);
+    for (const line of o.lines) await ai(line, 800);
+    add(el(`<div class="media t-body-small fade-in">${o.mediaNote}</div>`));
+
+    const row = add(el(`<div class="cta-row fade-in">
+        <button class="btn" id="${o.id}" type="button">${o.cta} ${ICON.squareArrowOutUpRight}</button>
+      </div>`));
+    await new Promise(r => row.querySelector('button').addEventListener('click', r, { once: true }));
+    you(o.cta);
+    row.remove();
+
+    await handoff(o.host, o.opening, 1300);
+    /* we cannot know what happened over there, so Continue appears rather than
+       un-greys. The last step has none: there is nothing after it to continue to,
+       and a button that leads nowhere is worse than no button. */
+    if (!o.last) you(await askButtons(['Continue']));
+  }
+
+  async function ugcOffer() {
+    await handoffStep({
+      divider: '08 · UGC offer',
+      id: 'ugcBtn',
+      lines: [
+        'Two optional extras before I let you go. First, ads.',
+        'CreateUGC turns any product into a scroll-stopping video &mdash; ready for TikTok, Instagram and YouTube.'
+      ],
+      mediaNote: 'Video preview',
+      cta: 'Generate my first video',
+      host: 'createugc.ai',
+      opening: 'Opening CreateUGC&hellip;'
+    });
+  }
+
+  async function courseStep() {
+    await handoffStep({
+      divider: '09 · Course',
+      id: 'courseBtn',
+      lines: [
+        'And the Shopify Dropshipping Course 2026 &mdash; everything you need to know to start your store.',
+        'It covers finding winning products and qualifying them, your Shopify settings, Facebook pixels and ads, making the ad creatives, fulfilling orders, and building out your homepage and landing page.'
+      ],
+      mediaNote: 'Course video',
+      cta: 'Take your course',
+      host: 'youtube.com',
+      opening: 'Opening the course&hellip;',
+      last: true
+    });
+    progress.finish();
+    await ai(`That&rsquo;s everything from me. Your ${state.niche} store is yours now.`, 900);
+  }
+
+  /* leaving to Shopify — a fake browser sheet, same as the earlier prototypes */
+  async function handoff(url, text, ms) {
+    const overlay = el(`<div class="handoff"><div class="sheet">
+        <div class="sheet-bar"><i></i><i></i><i></i><span class="sheet-url t-caption">${url}</span></div>
+        <div class="sheet-body"><div class="sheet-spin"></div><div class="t-body-small">${text}</div></div>
+      </div></div>`);
+    shell.appendChild(overlay);
+    await sleep(ms);
+    overlay.remove();
+  }
+
+  /* Preview skeleton — content-shaped wait, 3–4s budget */
+  function skeleton() {
+    return add(el(`<div class="skeleton fade-in">
+        <div class="sk-chrome"><span class="sk-dot"></span><span class="sk-dot"></span><span class="sk-dot"></span><span class="sk sk--url"></span></div>
+        <div class="sk-nav"><span class="sk sk--logo"></span><span class="sk-links"><span class="sk sk--link"></span><span class="sk sk--link"></span><span class="sk sk--link wide"></span></span></div>
+        <div class="sk-hero"><span class="sk sk--hero"></span><span class="sk sk--line-lg"></span><span class="sk sk--line-sm"></span></div>
+        <div class="sk-products">
+          <span class="sk-cell"><span class="sk sk--img"></span><span class="sk sk--cap"></span><span class="sk sk--cap short"></span></span>
+          <span class="sk-cell"><span class="sk sk--img"></span><span class="sk sk--cap"></span><span class="sk sk--cap short"></span></span>
+          <span class="sk-cell"><span class="sk sk--img"></span><span class="sk sk--cap"></span><span class="sk sk--cap short"></span></span>
+        </div>
+      </div>`));
+  }
+
+  /* ---------------- the flow ---------------- */
+  async function run() {
+    /* 01 — niche */
+    divider('01 · Niche');
+    await ai('Hey! Let&rsquo;s build your store — first, what do you want to sell?');
+    const pick = await askPills(NICHES);
+    you(pick);
+    state.aiPicked = pick.indexOf('AI decide') > -1;
+    state.niche = state.aiPicked ? AI_PICK : pick.replace(/&amp;/g, '&');
+    if (state.aiPicked) {
+      await ai(`Happy to pick for you — right now, ${AI_PICK} is converting well for stores like yours. Let&rsquo;s build that.`);
+    }
+
+    /* 02 — homepage design, and the preview it produces. These loop together: asking
+       "looks good?" with one button is not a question, it is a notification, and the
+       merchant has no way to say the one thing they are most likely to think. Saying no
+       goes back to the designs, because the designs are what produced the preview. */
+    divider('02 · Homepage design');
+    await ai(`Now the look of your ${state.niche} store — pick your 2 favorites from the 6 designs below. They set how your homepage comes out.`);
+
+    const slug = state.niche.toLowerCase().replace(/[^a-z0-9]+/g, '');
+    while (true) {
+      state.designs = await askDesigns();
+      you(state.designs.map(d => d.name).join(' + '));
+
+      /* 03 — preparing the preview. No divider: this is not a step, just the assistant working.
+         Nothing is generated yet here, so the copy promises a preview, not a store. */
+      /* One line, then the skeleton, then the preview in its place. There used to be a second
+         line here, after the skeleton came down — but the skeleton reads as the preview, so that
+         line looked like it was being inserted between the reply and the store, and the screen
+         jumped. The designs are already named in the merchant's own answer above. */
+      await ai(`Putting your ${state.niche} preview together&hellip;`, 900);
+      const sk = skeleton();
+      await sleep(3500);
+      sk.remove();
+
+      add(el(`<div class="preview fade-in">
+          <div class="preview-chrome">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="preview-url t-caption">${slug}.myshopify.com</span>
+          </div>
+          <div class="preview-view"><img src="images/store-preview-pet.jpg" alt="${state.niche} store preview"></div>
+        </div>`));
+      add(el(`<div class="preview-caption t-caption fade-in">${state.niche} store &middot; draft, not yet live &mdash; scroll inside the frame to see more</div>`));
+
+      const verdict = await askButtons(['Looks good &mdash; what&rsquo;s next?',
+        { label: 'I&rsquo;d like a different look', icon: ICON.rotate }]);
+      you(verdict);
+      if (verdict.indexOf('Looks good') > -1) break;
+      await ai('No problem &mdash; pick two others and I&rsquo;ll rebuild it.', 600);
+    }
+
+    /* ---------- 05 · Shopify plan ---------- */
+    divider('03 · Shopify plan');
+    await ai(`Your store is ready. Activate your Shopify plan to launch.`);
+
+    const storeUrl = 'bys-user-store-597396-6u0n3jia.myshopify.com';
+    const offer = add(el(`<div class="offer fade-in">
+        <div class="offer-top">
+          <div class="offer-pitch">
+            <div>
+              <div class="offer-title">3 days free</div>
+              <div class="offer-ladder t-body-small">then $1/month for 3 months. $39/month after.</div>
+            </div>
+          </div>
+        </div>
+        <div class="path">
+          <div class="path-node done"><div class="path-circle">${ICON.check}</div><div class="path-label t-body-small">Store built on<span>BuildYourStore</span></div></div>
+          <div class="path-node active" id="pathNode2"><div class="path-circle">${ICON.click}</div><div class="path-label t-body-small">Activate plan on<span>Shopify</span></div></div>
+          <div class="path-node next" id="pathNode3"><div class="path-circle path-circle--mark">${BYS_MARK}</div><div class="path-label t-body-small">Finish setup on<span>BuildYourStore</span></div></div>
+        </div>
+        <div class="path-foot t-body-small">Opens in a new tab. Finish on Shopify, then come back here and tell me.</div>
+      </div>`));
+
+
+    add(el(`<div class="cta-row fade-in">
+        <button class="btn" id="activateBtn" type="button">Activate on Shopify ${ICON.squareArrowOutUpRight}</button>
+        <span class="cta-reassure t-body-small">${ICON.check}Cancel anytime</span>
+      </div>`));
+
+
+    const activateBtn = document.getElementById('activateBtn');
+    await new Promise(resolve => activateBtn.addEventListener('click', resolve, { once: true }));
+    activateBtn.disabled = true;
+    callMeBack(true);   // the tab itself asks to be returned to
+
+    /* handoff + waiting for the return leg */
+    offer.classList.add('spent');                 // the card is history now
+    const shopUrl = storeUrl.split('.')[0] + ' · shopify.com/admin/charges';
+    await handoff(shopUrl, 'Opening Shopify to approve the plan…', 1300);
+
+    /* "Yes" is a claim, not a fact: the click fires a real request to Shopify, and
+       so does every retry. Nothing here can talk its way past the check. */
+    let outcome = await confirmActivation(shopUrl);
+    let attempt = 0;
+
+    while (outcome !== 'published') {
+      if (outcome === 'reopen') { outcome = await confirmActivation(shopUrl); attempt = 0; continue; }
+
+      const work = add(el(`<div class="waiting fade-in">
+          <div class="waiting-row t-body-small"><span class="spin"></span><span></span></div>
+        </div>`));
+      const label = work.querySelector('.waiting-row span:last-child');
+      label.innerHTML = attempt === 0 ? 'Checking your plan on Shopify&hellip;' : 'Checking again&hellip;';
+      await sleep(1500);
+
+      if (failPublish) {
+        work.remove();
+        outcome = await planNotFound(shopUrl, ++attempt);
+        continue;
+      }
+
+      label.innerHTML = 'Activating your plan&hellip;';
+      await sleep(2000);
+
+      /* the row that did the work reports the result and stays — a second banner
+         would announce the same fact twice, out of sync with the path animation */
+      const done = work.querySelector('.waiting-row');
+      done.innerHTML = `${ICON.check}<span>Plan active</span>`;
+      done.classList.add('done');
+      completePath();
+      outcome = 'published';
+    }
+
+    /* the plan is the gate, not the finish — the conversation moves straight on */
+    divider('04 · Store type');
+    /* The free card is gone from this step, so "how do you want your store built?" was
+       asking about a choice no longer on screen. The sell is one bubble and the ask is
+       another: a question the merchant can answer is what makes the two buttons an
+       answer rather than an interruption. Active voice with the doer named — they pick,
+       they build — and the value stated as the merchant's own contrast: finished, rather
+       than something still left to finish. It also says out loud that this is a
+       ONE-product store — they just previewed a ten-product one, and that difference
+       was nowhere on the step. */
+    await ai(`There&rsquo;s a version our team builds for you: they pick one product that&rsquo;s already selling, then build your whole ${state.niche} store around it.`, 900);
+    await ai('You get it finished &mdash; not something you still have to finish yourself. Want us to build it?', 500);
+
+    let storeType = await askStoreType();
+    you(storeType === 'pro' ? 'Continue like the pros' : 'Keep the free store');
+
+    /* The downsell fires on whichever way they end up declining, and only once.
+       No "are you sure" before it any more: that claimed the Pro store could never be
+       unlocked again and then unlocked it a line later, which spends trust to buy
+       nothing. There are two ways to say no — the button here, and opening the payment
+       and closing it again — and the second one is the more interesting of the two,
+       because they wanted it enough to get that far. It used to get nothing. */
+    let offered = false;
+    const downsell = async () => {
+      if (offered) return 'free';
+      offered = true;
+      return offerDownsell();
+    };
+    if (storeType === 'free') storeType = await downsell();
+
+    /* paying is a modal, because a card form is a task, not a turn in a conversation */
+    while (storeType === 'pro' || storeType === 'pro47') {
+      const paid = await paymentModal(storeType === 'pro47' ? 47 : 97);
+      if (paid === 'paid') break;
+      await ai('No rush &mdash; tell me when you&rsquo;re ready.', 500);
+      const again = await askButtons(['Open payment again', 'Keep the free store']);
+      you(again);
+      if (again.indexOf('free') > -1) {
+        storeType = await downsell();
+        if (storeType === 'free') break;
+      }
+    }
+
+    state.storeType = storeType;
+
+    const paid = storeType === 'pro' || storeType === 'pro47';
+    await ai(paid
+      ? `Payment received. Now I&rsquo;ll build your ${state.niche} store.`
+      : `Got it &mdash; you keep the free 10-product ${state.niche} store. Let me put it together.`, 600);
+
+    let built = await buildCeremony();
+    while (built === 'failed') {
+      await ai('I couldn&rsquo;t finish building your store.', 600);
+      you(await askButtons(['Try again']));
+      built = await buildCeremony();
+    }
+    /* No "your store is built" line — the block folds into "Built your store · 6 steps" and
+       says it already. Just a beat, so that lands before the next step arrives. */
+    await sleep(REDUCED ? 200 : 900);
+    await addProducts();
+  }
+
+  $('statesBtn').addEventListener('click', () => {
+    divider('Assistant states — prototype reference');
+    add(el(`<div class="states-ref fade-in">
+        <div class="state-item">
+          <div class="demo"><div class="status"><div class="dots"><i></i><i></i><i></i></div></div></div>
+          <div class="meta t-caption">Typing — from 400ms. Under 400ms nothing is shown at all, otherwise the indicator just flickers.</div>
+        </div>
+        <div class="state-item">
+          <div class="demo"><div class="status"><div class="status-row">${ICON.brain}<span class="status-label t-body-small shimmer-text">Thinking&hellip;</span></div></div></div>
+          <div class="meta t-caption">Thinking — from 2.5s. The pause gets a name so it reads as work, not a stall.</div>
+        </div>
+        <div class="state-item">
+          <div class="demo"><div class="status"><div class="status-row">${ICON.brain}<span class="status-label t-body-small shimmer-text">Thinking&hellip;</span></div>
+            <div class="status-note t-caption">Still thinking — this one&rsquo;s taking a moment</div></div></div>
+          <div class="meta t-caption">Slow — from 8s. One honest reassurance line; at 20s the flow falls through to the error state.</div>
+        </div>
+      </div>`));
+  });
+
+  /* prototype switch, so the publish-failure state can be reviewed without faking a flow */
+  let failPublish = false;
+  let failBuild = false;
+  $('buildBtn').addEventListener('click', () => {
+    failBuild = !failBuild;
+    $('buildBtn').classList.toggle('on', failBuild);
+    $('buildBtn').textContent = failBuild ? 'Build: fails' : 'Build: works';
+  });
+  $('publishBtn').addEventListener('click', () => {
+    failPublish = !failPublish;
+    $('publishBtn').classList.toggle('on', failPublish);
+    $('publishBtn').textContent = failPublish ? 'Publish: fails' : 'Publish: works';
+  });
+
+  let domainTaken = false;
+  $('domainBtn').addEventListener('click', () => {
+    domainTaken = !domainTaken;
+    $('domainBtn').classList.toggle('on', domainTaken);
+    $('domainBtn').textContent = domainTaken ? 'Domain: taken' : 'Domain: free';
+  });
+
+  let shortOffer = false;
+  $('offerBtn').addEventListener('click', () => {
+    shortOffer = !shortOffer;
+    $('offerBtn').classList.toggle('on', shortOffer);
+    $('offerBtn').textContent = shortOffer ? 'Offer: 10 sec' : 'Offer: 10 min';
+  });
+
+  $('restartBtn').addEventListener('click', () => location.reload());
+  run();
+})();
+</script>
